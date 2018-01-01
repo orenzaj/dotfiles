@@ -55,16 +55,27 @@ PS1+=${bottomborder}${bottomprompt}
 export PS1
 
 # NAMED PATHS 
-CMS="$HOME/Development/cms/"
+SECAPP="$HOME/Dev/secureapps/src"
+CMS="$HOME/Dev/cms/src"
 GOSRC="$GOPATH/src"
 
 # ALIASES
-alias venvcms=". $CMS/../cms-env/bin/activate"
-alias runcms="python $CMS/247/manage.py runserver"
-alias shellcms="python $CMS/247/manage.py shell_plus"
-alias migratecms="python $CMS/247/manage.py migrate --noinput"
-alias celerycms="cd $CMS/247 && celery -A celery_init worker -c1 --loglevel=debug"
 alias ls="ls --color=auto --group-directories-first"
+
+# CMS
+alias venvcms=". $HOME/cms/env/bin/activate"
+alias runcms="python $HOME/cms/src/247/manage.py runserver"
+alias shellcms="python $HOME/cms/src/247/manage.py shell_plus"
+alias migratecms="python $HOME/cms/src/247/manage.py migrate --noinput"
+alias celerycms="cd $HOME/cms/src/247 && celery -A celery_init worker -c1 --loglevel=debug"
+
+# SECURE APPS
+alias venvsec=". $HOME/secureapps/env/bin/activate"
+alias runsec="python $HOME/secureapps/src/manage.py runserver"
+alias shellsec="python $HOME/secureapps/src/manage.py shell_plus"
+alias migratesec="python $HOME/secureapps/src/manage.py migrate --noinput"
+alias celerysec="cd $HOME/secureapps/src && celery -A celery_init worker -c1 --loglevel=debug"
+
 
 # TILIX
 if [ $TILIX_ID ] || [ $VTE_VERSION ] ; then source /etc/profile.d/vte.sh; fi # Ubuntu Budgie END
