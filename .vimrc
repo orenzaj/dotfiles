@@ -13,7 +13,6 @@ set viminfo+=! " make sure it can save viminfo
 " returns to the same position.
 au BufReadPost * if line("'\"") > 0|if line("'\"") <= line("$")|exe("norm '\"")|else|exe "norm $"|endif|endif|call RecentFilesAdd()
 
-
 " VimPlug Settings
 call plug#begin('~/.vim/plugged')
     Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
@@ -83,8 +82,12 @@ map <leader>cd :cd %:p:h<cr>:pwd<cr>
 " Recent Files
 nmap <leader>f :call RecentFilesList()<cr>
 
+" Status Line
+set laststatus=2
+set statusline=%{HasPaste()}%F%m%r%h\ %w\ \ \ \ \ \ 
+set statusline+=col:\ %c
+
 " Syntastic Settings
-set statusline=%{HasPaste()}%F%m%r%h\ %w\ \ \ \ \ \ col:\ %c
 let g:syntastic_python_checkers=['flake8']
 " let g:syntastic_python_flake8_post_args='--ignore=E256,E702,E266,E722,E731,E501,E225,F841,F401,F403,F405' 
 let g:syntastic_python_flake8_post_args='--ignore=E722' 
