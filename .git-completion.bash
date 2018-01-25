@@ -1,1 +1,0 @@
-/home/jorenza/.git-completion.bash
