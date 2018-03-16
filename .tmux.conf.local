@@ -269,3 +269,7 @@ bind C-b send-prefix
 #set -g status-position top
 
 bind-key C-a last-window
+
+
+# Plugins
+set -g @plugin 'tmux-plugins/tmux-resurrect'

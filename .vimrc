@@ -22,8 +22,8 @@ call plug#begin('~/.vim/plugged')
     Plug 'vim-syntastic/syntastic'
     Plug 'mileszs/ack.vim'
     Plug 'ggreer/the_silver_searcher'
-	Plug 'vim-scripts/RecentFiles'
-	Plug 'rafi/awesome-vim-colorschemes'
+    Plug 'vim-scripts/RecentFiles'
+    Plug 'rafi/awesome-vim-colorschemes'
     " Themes
     Plug 'sjl/badwolf'
     Plug 'vim-scripts/peaksea'
