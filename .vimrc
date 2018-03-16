@@ -17,10 +17,13 @@ call plug#begin('~/.vim/plugged')
     Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
     Plug 'jlanzarotta/bufexplorer'
     Plug 'tpope/vim-surround'
+    Plug 'tpope/vim-repeat'
     Plug 'airblade/vim-gitgutter'
     Plug 'vim-syntastic/syntastic'
     Plug 'mileszs/ack.vim'
     Plug 'ggreer/the_silver_searcher'
+	Plug 'vim-scripts/RecentFiles'
+	Plug 'rafi/awesome-vim-colorschemes'
     " Themes
     Plug 'sjl/badwolf'
     Plug 'vim-scripts/peaksea'
@@ -31,6 +34,7 @@ if $COLORTERM == 'gnome-terminal'
     set t_Co=256
 endif
 
+colorscheme peaksea
 set background=dark
 syntax on
 

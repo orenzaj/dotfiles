@@ -268,4 +268,4 @@ bind C-b send-prefix
 # move status line to top
 #set -g status-position top
 
-# bind-key C-a last-window
+bind-key C-a last-window

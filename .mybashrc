@@ -59,15 +59,23 @@ PS1+=${bottomborder}${bottomprompt}
 export PS1
 
 alias pyclean='find . -type f -name "*.py[co]" -exec rm -f \{\} \;'
+alias cmskill="kill $(lsof -i:8000 | grep '[p]ython') | awk '{print $2}'"
 
-alias venvcms=". ~/git/cms/cms-env/bin/activate"
-alias runcms="python ~/git/cms/src/247/manage.py runserver --insecure"
-alias migratecms="python ~/git/cms/src/247/manage.py migrate --noinput"
-alias shellcms="python ~/git/cms/src/247/manage.py shell_plus"
-alias celerycms="cd ~/git/cms/src/247 && celery -A celery_init worker --loglevel=debug"
+alias startdockers="docker start dev-centerprise-nginx dev-centerprise-sentry dev-centerprise-cms dev-centerprise-cms-login"
+alias stopdockers="docker stop dev-centerprise-cms-login dev-centerprise-cms dev-centerprise-sentry dev-centerprise-nginx"
+alias cmsinstance="startdockers && centenv && centsource"
 
-alias startdockers="docker start dev-centerprise-nginx dev-centerprise-sentry dev-centerprise-cms"
-alias venvcent=". ~/git/centerprise/cent-env/bin/activate"
+alias cmspath="cd ~/git/cms/src/247"
+alias cmsenv="source ~/git/cms/cms-env/bin/activate && cmspath"
+alias cmsserver="cmsenv && python manage.py runserver --insecure"
+alias cmsmigrate="cmsenv && python manage.py migrate --noinput"
+alias cmsmake="cmspath && python manage.py makemigrations --noinput"
+alias cmsshell="cmsenv && python manage.py shell_plus"
+alias cmscelery="cmsenv && celery -A celery_init worker --loglevel=debug"
+
+alias centpath="cd ~/git/centerprise/src/"
+alias centenv="source ~/git/centerprise/cent-env/bin/activate"
+alias centsource="source ~/git/centerprise/src/development.sh && docker attach dev-centerprise-cms"
 
 alias venvsec=". ~/git/secureapps/secure-apps-env/bin/activate"
 alias migratesec="python ~/secureapps/manage.py migrate --noinput"
@@ -75,3 +83,6 @@ alias runsec="python ~/secureapps/manage.py runserver 0.0.0.0:8080 --insecure"
 alias celerysec="cd ~/git/secureapps/src/ && celery -A celery_init worker --loglevel=debug"
 
 alias rdb="telnet localhost 6900"
+
+alias xclip-grab="xclip -i -selection clipboard"
+alias speedtest="curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python -"
