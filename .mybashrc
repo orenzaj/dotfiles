@@ -59,7 +59,7 @@ PS1+=${bottomborder}${bottomprompt}
 export PS1
 
 alias pyclean='find . -type f -name "*.py[co]" -exec rm -f \{\} \;'
-alias cmskill="kill $(lsof -i:8000 | grep '[p]ython') | awk '{print $2}'"
+alias cmskill="kill \$(lsof -i:8000 | grep '[p]ython') | awk '{print \$2}'"
 
 alias startdockers="docker start dev-centerprise-nginx dev-centerprise-sentry dev-centerprise-cms dev-centerprise-cms-login"
 alias stopdockers="docker stop dev-centerprise-cms-login dev-centerprise-cms dev-centerprise-sentry dev-centerprise-nginx"
@@ -68,7 +68,7 @@ alias cmsinstance="startdockers && centenv && centsource"
 alias cmspath="cd ~/git/cms/src/247"
 alias cmsenv="source ~/git/cms/cms-env/bin/activate && cmspath"
 alias cmsserver="cmsenv && python manage.py runserver --insecure"
-alias cmsmigrate="cmsenv && python manage.py migrate --noinput"
+alias cmsmigrate="cmspath && python manage.py migrate --noinput"
 alias cmsmake="cmspath && python manage.py makemigrations --noinput"
 alias cmsshell="cmsenv && python manage.py shell_plus"
 alias cmscelery="cmsenv && celery -A celery_init worker --loglevel=debug"
