@@ -8,7 +8,7 @@ if [ -f ~/.git-prompt.sh ]; then
 fi
 
 # PATHS
-export PATH=$PATH:/usr/local/go/bin
+export PATH=$PATH:/usr/local/go/bin:$HOME/.local/bin
 export GOPATH=$HOME/go
 export GOBIN=$GOPATH/bin
 export PATH=$PATH:$GOBIN
@@ -24,7 +24,7 @@ export CPPFLAGS="-P"
 # export RABBITMQ_SERVER_ERL_ARGS="-setcookie rabbit"
 # export RABBITMQ_CTL_ERL_ARGS="-setcookie rabbit"
 
-# COLORS
+### COLORS ###
 bold=$(tput bold)
 normal=$(tput sgr0)
 reset=$(tput setaf 0)
@@ -36,7 +36,7 @@ purple=$(tput setaf 5)
 turquoise=$(tput setaf 6)
 grey=$(tput setaf 7)
 
-# PROMPT
+### PROMPT ###
 topborder="\n\[${bold}\]\[${orange}\]\342\224\215"
 mainprompt="[\[${normal}\]\[${red}\]\u@\H: \w\[${bold}\]\[${orange}\]]\[${normal}\]"
 bottomborder="\n\[${bold}\]\[${orange}\]\342\224\225▶"
@@ -86,3 +86,13 @@ alias rdb="telnet localhost 6900"
 
 alias xclip-grab="xclip -i -selection clipboard"
 alias speedtest="curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python -"
+
+function vim() {
+  if test $# -gt 0; then
+    env vim "$@"
+  elif test -f Session.vim; then
+    env vim -S
+  else
+    env vim -c Obsession
+  fi
+}
