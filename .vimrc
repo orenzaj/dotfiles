@@ -25,14 +25,17 @@ call plug#begin('~/.vim/plugged')
     Plug 'ggreer/the_silver_searcher'
     Plug 'vim-scripts/RecentFiles'
     Plug 'rafi/awesome-vim-colorschemes'
+    Plug 'itchyny/lightline.vim'
     " Themes
     Plug 'sjl/badwolf'
 call plug#end()
 
 set termguicolors
 set background=dark
-colorscheme PaperColor
-set t_Co=256
+
+if !has('gui_running')
+    set t_Co=256
+endif 
 let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
 let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
 
@@ -40,6 +43,8 @@ syntax on
 set mouse=a
 
 " TABS
+set guioptions-=e
+set noshowmode
 set expandtab
 set tabstop=4
 set shiftwidth=4
@@ -86,11 +91,26 @@ map <leader>cd :cd %:p:h<cr>:pwd<cr>
 " Recent Files
 nmap <leader>f :call RecentFilesList()<cr>
 
-" Status Line
-set laststatus=2
-set statusline=%{HasPaste()}%F%m%r%h\ %w\ \ \ \ \ \ 
-set statusline+=column:\ %c
-set statusline+=%{ObsessionStatus('[active]','[paused]')}
+" Light Line (statusline)
+set laststatus=2 
+
+let g:lightline = {
+            \ 'component_function': {
+            \   'filename': 'LightLineFilename'
+            \ },
+            \ 'active': {
+            \   'left': [ [ 'mode', 'paste',  ], [ 'readonly', 'relativepath', 'modified' ] ]
+            \ }
+            \ }
+function! LightLineFilename()
+    return expand('%:F')
+endfunction
+
+colorscheme PaperColor
+
+" set statusline=%{HasPaste()}%F%m%r%h\ %w\ \ \ \ \ \ 
+" set statusline+=column:\ %c
+" set statusline+=%{ObsessionStatus('[active]','[paused]')}
 
 " Syntastic Settings
 let g:syntastic_python_checkers=['flake8']
@@ -107,13 +127,6 @@ let g:syntastic_check_on_wq = 0
 
 " Toggle paste mode on and off
 map <leader>pp :setlocal paste!<cr>
-
-function! HasPaste()
-    if &paste
-        return '[PASTE] '
-    endif
-    return ''
-endfunction
 
 nnoremap <silent> <F5> :SyntasticCheck<CR>  
 
@@ -167,6 +180,7 @@ au FileType python inoremap <buffer> $i import
 au FileType python inoremap <buffer> $p print 
 au FileType python inoremap <buffer> $f #--- <esc>a
 au FileType python map <buffer> F :set foldmethod=indent<cr>
+au FileType python map <buffer> M :set foldmethod=manual<cr>
 au FileType python map <buffer> <leader>1 /class 
 au FileType python map <buffer> <leader>2 /def 
 au FileType python map <buffer> <leader>C ?class 

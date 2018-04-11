@@ -48,23 +48,32 @@ ve() {
     fi
 }
 
-gb(){
+gp(){
     __git_ps1 "[%s]" | sed -e "s/^\[/$(printf ${bold}${orange}\[${normal}${green})/" -e "s/]/$(printf ${bold}${orange}]${normal})/"
 }
 
 PS1=${topborder}${mainprompt}
 PS1+='$(ve)'
-PS1+='$(gb)'
+PS1+='$(gp)'
 PS1+=${bottomborder}${bottomprompt}
 export PS1
 
 alias pyclean='find . -type f -name "*.py[co]" -exec rm -f \{\} \;'
 alias cmskill="kill \$(lsof -i:8000 | grep '[p]ython') | awk '{print \$2}'"
+alias mongothemelist="mongofiles -h 172.17.0.1 -d apts247_secureapps_themes --prefix=\$(basename \$PWD) --quiet list"
+alias mongothemedir="mongothemelist | awk '{print \"mkdir \"\$1}' | cut -d'/' -sf1 | sort -u | sh"
+alias mongogetallthemes="mongothemedir && mongothemelist | awk '{print \"mongofiles -h 172.17.0.1 -d apts247_secureapps_themes --prefix=\$(basename \$PWD) get \"\$1}' | sh"
+alias mongodesignlist="mongofiles -h 172.17.0.1 -d apts247_secureapps_designs --prefix=\$(basename \$PWD) --quiet list"
+alias mongodesigndir="mongodesignlist | awk '{print \"mkdir \"\$2}' | cut -d'/' -sf1 | sort -u | sh"
+alias mongogetalldesigns="mongodesigndir && mongodesignlist | awk '{print \"mongofiles -h 172.17.0.1 -d apts247_secureapps_designs --prefix=\$(basename \$PWD) get \"\$1}' | sh"
 
 alias startdockers="docker start dev-centerprise-nginx dev-centerprise-sentry dev-centerprise-cms dev-centerprise-cms-login"
 alias stopdockers="docker stop dev-centerprise-cms-login dev-centerprise-cms dev-centerprise-sentry dev-centerprise-nginx"
 alias cmsinstance="startdockers && centenv && centsource"
 
+alias cmsdb="curl http://192.168.86.5/cms.sql.gz -o ~/Downloads/cms.sql.Z"
+alias cmsimport="dropdb cms && createdb cms && zcat cms.sql.Z | psql -f - cms" 
+alias cmsreimport="cmsdb && cmsimport"
 alias cmspath="cd ~/git/cms/src/247"
 alias cmsenv="source ~/git/cms/cms-env/bin/activate && cmspath"
 alias cmsserver="cmsenv && python manage.py runserver --insecure"
@@ -95,4 +104,36 @@ function vim() {
   else
     env vim -c Obsession
   fi
+}
+
+
+function gb {
+    if [[ "$#" -ge 1 ]]; then
+        if echo "${1}"|grep '^[0-9]\+$' ; then
+            branch=$(echo -e "`git branch -a|grep -v HEAD|grep remote|sed "s/.*\/origin\///"|sort|head -n ${1}|tail -n 1`");
+            echo -e "\n"
+            git checkout $branch
+        else
+            echo -e  "`git branch -a|grep -v HEAD|grep remote|grep ${1}|sed "s/.*\/origin\///"|sort|awk '{printf("%3d: %s\n", NR, $0)}'`";
+            output=$(echo -e "`git branch -a|grep -v HEAD|grep remote|grep ${1}|wc -l`");
+            if [ "$output" -ge 1 ]; then
+                if [ "$#" -ge 2 ]; then
+                    branch=$(echo -e "`git branch -a|grep -v HEAD|grep remote|grep ${1}|sed "s/.*\/origin\///"|sort|head -n ${2}|tail -n 1`");
+                    echo -e "\n"
+                    git checkout $branch
+                else
+                    if [ "$output" -le 1 ]; then
+                        echo -e "\n"
+                        git checkout ${1}
+                    fi
+                fi
+            else
+                echo -e "git push origin origin:refs/heads/${1}";
+                git push origin origin:refs/heads/${1}
+                git checkout ${1}
+            fi
+        fi
+    else
+        echo "`git branch -a|grep -v HEAD|grep remote|sed "s/.*\/origin\///"|sort|awk '{printf("%3d: %s\n", NR, $0)}'`";
+    fi
 }
