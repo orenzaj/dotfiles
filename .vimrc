@@ -1,4 +1,4 @@
-" This will auto install vim-plug 
+" This will auto install vim-plug if empty(glob('~/.vim/autoload/plug.vim'))
 if empty(glob('~/.vim/autoload/plug.vim'))
     silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
         \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
@@ -8,8 +8,7 @@ endif
 " Save vim info
 set viminfo+=! " make sure it can save viminfo
 
-" This beauty remembers where you were the last time you edited the file, and
-" returns to the same position.
+" This beauty remembers where you were the last time you edited the file, and " returns to the same position.
 au BufReadPost * if line("'\"") > 0|if line("'\"") <= line("$")|exe("norm '\"")|else|exe "norm $"|endif|endif|call RecentFilesAdd()
 
 " VimPlug Settings
@@ -26,8 +25,6 @@ call plug#begin('~/.vim/plugged')
     Plug 'vim-scripts/RecentFiles'
     Plug 'rafi/awesome-vim-colorschemes'
     Plug 'itchyny/lightline.vim'
-    " Themes
-    Plug 'sjl/badwolf'
 call plug#end()
 
 set termguicolors
@@ -91,22 +88,22 @@ map <leader>cd :cd %:p:h<cr>:pwd<cr>
 " Recent Files
 nmap <leader>f :call RecentFilesList()<cr>
 
+colorscheme PaperColor
+
 " Light Line (statusline)
 set laststatus=2 
-
 let g:lightline = {
             \ 'component_function': {
             \   'filename': 'LightLineFilename'
             \ },
-            \ 'active': {
-            \   'left': [ [ 'mode', 'paste',  ], [ 'readonly', 'relativepath', 'modified' ] ]
+            \ 'active': { 
+            \   'left': [ [ 'mode', 'paste',  ], [ 'readonly', 'relativepath', 'modified' ] ], 
             \ }
             \ }
 function! LightLineFilename()
     return expand('%:F')
 endfunction
 
-colorscheme PaperColor
 
 " set statusline=%{HasPaste()}%F%m%r%h\ %w\ \ \ \ \ \ 
 " set statusline+=column:\ %c
