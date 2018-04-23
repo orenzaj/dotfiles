@@ -8,7 +8,8 @@ endif
 " Save vim info
 set viminfo+=! " make sure it can save viminfo
 
-" This beauty remembers where you were the last time you edited the file, and " returns to the same position.
+" This beauty remembers where you were the last time you edited the file, and
+" returns to the same position.
 au BufReadPost * if line("'\"") > 0|if line("'\"") <= line("$")|exe("norm '\"")|else|exe "norm $"|endif|endif|call RecentFilesAdd()
 
 " VimPlug Settings
@@ -36,6 +37,7 @@ endif
 let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
 let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
 
+colorscheme PaperColor
 syntax on
 set mouse=a
 
@@ -88,7 +90,6 @@ map <leader>cd :cd %:p:h<cr>:pwd<cr>
 " Recent Files
 nmap <leader>f :call RecentFilesList()<cr>
 
-colorscheme PaperColor
 
 " Light Line (statusline)
 set laststatus=2 
@@ -176,8 +177,8 @@ au FileType python inoremap <buffer> $r return
 au FileType python inoremap <buffer> $i import 
 au FileType python inoremap <buffer> $p print 
 au FileType python inoremap <buffer> $f #--- <esc>a
-au FileType python map <buffer> F :set foldmethod=indent<cr>
-au FileType python map <buffer> M :set foldmethod=manual<cr>
+map <buffer> F :set foldmethod=indent<cr>
+map <buffer> M :set foldmethod=manual<cr>
 au FileType python map <buffer> <leader>1 /class 
 au FileType python map <buffer> <leader>2 /def 
 au FileType python map <buffer> <leader>C ?class 

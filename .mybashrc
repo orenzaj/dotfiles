@@ -1,11 +1,17 @@
-# SOURCE FILES
-if [ -f ~/.git-completion.bash ]; then
-    . ~/.git-completion.bash
-fi
+#### SOURCE FILES ####
+# Git 
+if [ -f ~/.git-completion.bash ]; then . ~/.git-completion.bash ; fi
+if [ -f ~/.git-prompt.sh ]; then . ~/.git-prompt.sh ; fi
 
-if [ -f ~/.git-prompt.sh ]; then
-    . ~/.git-prompt.sh
-fi
+# Aliases
+if [ -f ~/.bash_aliases ]; then . ~/.bash_aliases ; fi
+
+# Colors
+if [ -f ~/.bash_colors ]; then . ~/.bash_colors ; fi
+
+# Prompt
+if [ -f ~/.bash_prompt ]; then . ~/.bash_prompt ; fi
+######################
 
 # PATHS
 export PATH=$PATH:/usr/local/go/bin:$HOME/.local/bin
@@ -19,83 +25,7 @@ export VIRTUAL_ENV_DISABLE_PROMPT=1
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"/usr/local/lib"
 export CPPFLAGS="-P"
 
-# export PATH=$PATH:/usr/lib/rabbitmq/bin
-# export RABBITMQ_CONFIG_FILE=/home/jorenza/config/rabbitmq
-# export RABBITMQ_SERVER_ERL_ARGS="-setcookie rabbit"
-# export RABBITMQ_CTL_ERL_ARGS="-setcookie rabbit"
-
-### COLORS ###
-bold=$(tput bold)
-normal=$(tput sgr0)
-reset=$(tput setaf 0)
-red=$(tput setaf 1)
-green=$(tput setaf 2)
-orange=$(tput setaf 3)
-blue=$(tput setaf 4)
-purple=$(tput setaf 5)
-turquoise=$(tput setaf 6)
-grey=$(tput setaf 7)
-
-### PROMPT ###
-topborder="\n\[${bold}\]\[${orange}\]\342\224\215"
-mainprompt="[\[${normal}\]\[${red}\]\u@\H: \w\[${bold}\]\[${orange}\]]\[${normal}\]"
-bottomborder="\n\[${bold}\]\[${orange}\]\342\224\225▶"
-bottomprompt=" \[${normal}\]"
-
-ve() {
-    if [ ${VIRTUAL_ENV}  ] ; then
-        printf "${bold}${orange}[${normal}${turquoise}`basename \"${VIRTUAL_ENV}\"`${bold}${orange}]${normal}"
-    fi
-}
-
-gp(){
-    __git_ps1 "[%s]" | sed -e "s/^\[/$(printf ${bold}${orange}\[${normal}${green})/" -e "s/]/$(printf ${bold}${orange}]${normal})/"
-}
-
-PS1=${topborder}${mainprompt}
-PS1+='$(ve)'
-PS1+='$(gp)'
-PS1+=${bottomborder}${bottomprompt}
-export PS1
-
-alias pyclean='find . -type f -name "*.py[co]" -exec rm -f \{\} \;'
-alias cmskill="kill \$(lsof -i:8000 | grep '[p]ython') | awk '{print \$2}'"
-alias mongothemelist="mongofiles -h 172.17.0.1 -d apts247_secureapps_themes --prefix=\$(basename \$PWD) --quiet list"
-alias mongothemedir="mongothemelist | awk '{print \"mkdir \"\$1}' | cut -d'/' -sf1 | sort -u | sh"
-alias mongogetallthemes="mongothemedir && mongothemelist | awk '{print \"mongofiles -h 172.17.0.1 -d apts247_secureapps_themes --prefix=\$(basename \$PWD) get \"\$1}' | sh"
-alias mongodesignlist="mongofiles -h 172.17.0.1 -d apts247_secureapps_designs --prefix=\$(basename \$PWD) --quiet list"
-alias mongodesigndir="mongodesignlist | awk '{print \"mkdir \"\$2}' | cut -d'/' -sf1 | sort -u | sh"
-alias mongogetalldesigns="mongodesigndir && mongodesignlist | awk '{print \"mongofiles -h 172.17.0.1 -d apts247_secureapps_designs --prefix=\$(basename \$PWD) get \"\$1}' | sh"
-
-alias startdockers="docker start dev-centerprise-nginx dev-centerprise-sentry dev-centerprise-cms dev-centerprise-cms-login"
-alias stopdockers="docker stop dev-centerprise-cms-login dev-centerprise-cms dev-centerprise-sentry dev-centerprise-nginx"
-alias cmsinstance="startdockers && centenv && centsource"
-
-alias cmsdb="curl http://192.168.86.5/cms.sql.gz -o ~/Downloads/cms.sql.Z"
-alias cmsimport="dropdb cms && createdb cms && zcat cms.sql.Z | psql -f - cms" 
-alias cmsreimport="cmsdb && cmsimport"
-alias cmspath="cd ~/git/cms/src/247"
-alias cmsenv="source ~/git/cms/cms-env/bin/activate && cmspath"
-alias cmsserver="cmsenv && python manage.py runserver --insecure"
-alias cmsmigrate="cmspath && python manage.py migrate --noinput"
-alias cmsmake="cmspath && python manage.py makemigrations --noinput"
-alias cmsshell="cmsenv && python manage.py shell_plus"
-alias cmscelery="cmsenv && celery -A celery_init worker --loglevel=debug"
-
-alias centpath="cd ~/git/centerprise/src/"
-alias centenv="source ~/git/centerprise/cent-env/bin/activate"
-alias centsource="source ~/git/centerprise/src/development.sh && docker attach dev-centerprise-cms"
-
-alias venvsec=". ~/git/secureapps/secure-apps-env/bin/activate"
-alias migratesec="python ~/secureapps/manage.py migrate --noinput"
-alias runsec="python ~/secureapps/manage.py runserver 0.0.0.0:8080 --insecure"
-alias celerysec="cd ~/git/secureapps/src/ && celery -A celery_init worker --loglevel=debug"
-
-alias rdb="telnet localhost 6900"
-
-alias xclip-grab="xclip -i -selection clipboard"
-alias speedtest="curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python -"
-
+# Functions
 function vim() {
   if test $# -gt 0; then
     env vim "$@"
