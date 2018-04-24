@@ -1,1 +1,21 @@
-/home/jorenza/.bash_prompt
+### PROMPT ###
+topborder="\n\[${bold}\]\[${orange}\]\342\224\215"
+mainprompt="[\[${normal}\]\[${red}\]\u@\H: \w\[${bold}\]\[${orange}\]]\[${normal}\]"
+bottomborder="\n\[${bold}\]\[${orange}\]\342\224\225▶"
+bottomprompt=" \[${normal}\]"
+
+ve() {
+    if [ ${VIRTUAL_ENV}  ] ; then
+        printf "${bold}${orange}[${normal}${turquoise}`basename \"${VIRTUAL_ENV}\"`${bold}${orange}]${normal}"
+    fi
+}
+
+gp(){
+    __git_ps1 "[%s]" | sed -e "s/^\[/$(printf ${bold}${orange}\[${normal}${green})/" -e "s/]/$(printf ${bold}${orange}]${normal})/"
+}
+
+PS1=${topborder}${mainprompt}
+PS1+='$(ve)'
+PS1+='$(gp)'
+PS1+=${bottomborder}${bottomprompt}
+export PS1

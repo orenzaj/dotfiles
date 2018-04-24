@@ -14,32 +14,39 @@ au BufReadPost * if line("'\"") > 0|if line("'\"") <= line("$")|exe("norm '\"")|
 
 " VimPlug Settings
 call plug#begin('~/.vim/plugged')
-    Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
+    Plug 'airblade/vim-gitgutter'
+    Plug 'ggreer/the_silver_searcher'
+    Plug 'mileszs/ack.vim'
     Plug 'jlanzarotta/bufexplorer'
+    Plug 'rafi/awesome-vim-colorschemes'
+    Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
     Plug 'tpope/vim-surround'
     Plug 'tpope/vim-repeat'
     Plug 'tpope/vim-obsession'   
-    Plug 'airblade/vim-gitgutter'
-    Plug 'vim-syntastic/syntastic'
-    Plug 'mileszs/ack.vim'
-    Plug 'ggreer/the_silver_searcher'
+    Plug 'tpope/vim-fugitive'   
     Plug 'vim-scripts/RecentFiles'
-    Plug 'rafi/awesome-vim-colorschemes'
+    Plug 'vim-syntastic/syntastic'
     Plug 'itchyny/lightline.vim'
+    Plug 'natebosch/vim-lsc'
+    Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+    Plug 'inkarkat/vim-mark'
+    Plug 'inkarkat/vim-ingo-library'
+    Plug 'python-rope/ropevim'
+    Plug 'dyng/ctrlsf.vim'
+    Plug 'terryma/vim-multiple-cursors'
 call plug#end()
 
 set termguicolors
-set background=dark
-
 if !has('gui_running')
     set t_Co=256
 endif 
+set background=dark
+
 let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
 let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
 
-colorscheme PaperColor
-syntax on
 set mouse=a
+set clipboard=unnamed
 
 " TABS
 set guioptions-=e
@@ -93,7 +100,22 @@ nmap <leader>f :call RecentFilesList()<cr>
 
 " Light Line (statusline)
 set laststatus=2 
+
+let g:PaperColor_Theme_Options = {
+  \   'language': {
+  \     'python': {
+  \       'highlight_builtins' : 1
+  \     },
+  \     'cpp': {
+  \       'highlight_standard_library': 1
+  \     },
+  \     'c': {
+  \       'highlight_builtins' : 1
+  \     }
+  \   }
+  \ }
 let g:lightline = {
+            \ 'colorscheme': 'PaperColor',
             \ 'component_function': {
             \   'filename': 'LightLineFilename'
             \ },
