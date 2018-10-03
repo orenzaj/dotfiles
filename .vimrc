@@ -8,8 +8,7 @@ endif
 " Save vim info
 set viminfo+=! " make sure it can save viminfo
 
-" This beauty remembers where you were the last time you edited the file, and
-" returns to the same position.
+" This beauty remembers where you were the last time you edited the file, and returns to the same position.
 au BufReadPost * if line("'\"") > 0|if line("'\"") <= line("$")|exe("norm '\"")|else|exe "norm $"|endif|endif|call RecentFilesAdd()
 
 " VimPlug Settings
@@ -20,33 +19,40 @@ call plug#begin('~/.vim/plugged')
     Plug 'jlanzarotta/bufexplorer'
     Plug 'rafi/awesome-vim-colorschemes'
     Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
+    Plug 'tpope/vim-eunuch'
     Plug 'tpope/vim-surround'
     Plug 'tpope/vim-repeat'
-    Plug 'tpope/vim-obsession'   
-    Plug 'tpope/vim-fugitive'   
+    Plug 'tpope/vim-obsession'
+    Plug 'tpope/vim-fugitive'
+    Plug 'tpope/vim-commentary'
     Plug 'vim-scripts/RecentFiles'
-    Plug 'vim-syntastic/syntastic'
     Plug 'itchyny/lightline.vim'
     Plug 'natebosch/vim-lsc'
-    Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
     Plug 'inkarkat/vim-mark'
     Plug 'inkarkat/vim-ingo-library'
     Plug 'python-rope/ropevim'
     Plug 'dyng/ctrlsf.vim'
     Plug 'terryma/vim-multiple-cursors'
+    Plug 'roxma/vim-tmux-clipboard'
+    Plug 'will133/vim-dirdiff'
+    Plug 'vim-scripts/TeTrIs.vim'
+    Plug 'tpope/vim-vinegar'
+    Plug 'mattn/emmet-vim/'
+    Plug 'jiangmiao/auto-pairs'
+    Plug 'simeji/winresizer'
+    Plug 'w0rp/ale'
 call plug#end()
 
 set termguicolors
 if !has('gui_running')
     set t_Co=256
-endif 
+endif
 set background=dark
+colorscheme PaperColor
 
 let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
 let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
 
-set mouse=a
-set clipboard=unnamed
 
 " TABS
 set guioptions-=e
@@ -67,17 +73,25 @@ set magic
 set noerrorbells
 set novisualbell
 
-" Leaders 
+" Leaders
 let mapleader=";"
 let g:mapleader=";"
 
 " Fast save
 nnoremap <leader>w :w!<cr>
 
+" Vim Copy settings
+set clipboard=unnamed,unnamedplus
+vmap <leader>yy "+y
+nmap <leader>pp "+p
+
+" Toggle paste mode on and off
+map <leader><leader>p :setlocal paste!<cr>
+
 " :W sudo saves
 command! W w !sudo tee % > /dev/null
 
-" Search with space 
+" Search with space
 noremap <space> /
 noremap <c-space> ?
 
@@ -85,8 +99,12 @@ noremap <c-space> ?
 if executable('ag')
   let g:ackprg = 'ag --vimgrep --smart-case'
 endif
+
+" Ack settings
 cnoreabbrev Ack Ack!
 map <leader>a :Ack<CR>
+vnoremap <Leader>a y:Ack <C-r>=fnameescape(@")<CR><CR>")
+vnoremap <Leader>f y:AckFile! <C-r>=fnameescape(@")<CR><CR>")
 
 " Disable search highlights, location list, quickfix list
 noremap <silent> <leader><esc> :noh <bar> lcl <bar> ccl<cr>
@@ -97,9 +115,11 @@ map <leader>cd :cd %:p:h<cr>:pwd<cr>
 " Recent Files
 nmap <leader>f :call RecentFilesList()<cr>
 
+" Split Lines
+nnoremap K i<CR><Esc>
 
 " Light Line (statusline)
-set laststatus=2 
+set laststatus=2
 
 let g:PaperColor_Theme_Options = {
   \   'language': {
@@ -119,8 +139,8 @@ let g:lightline = {
             \ 'component_function': {
             \   'filename': 'LightLineFilename'
             \ },
-            \ 'active': { 
-            \   'left': [ [ 'mode', 'paste',  ], [ 'readonly', 'relativepath', 'modified' ] ], 
+            \ 'active': {
+            \   'left': [ [ 'mode', 'paste',  ], [ 'readonly', 'relativepath', 'modified' ] ],
             \ }
             \ }
 function! LightLineFilename()
@@ -128,83 +148,53 @@ function! LightLineFilename()
 endfunction
 
 
-" set statusline=%{HasPaste()}%F%m%r%h\ %w\ \ \ \ \ \ 
-" set statusline+=column:\ %c
-" set statusline+=%{ObsessionStatus('[active]','[paused]')}
-
-" Syntastic Settings
-let g:syntastic_python_checkers=['flake8']
-" let g:syntastic_python_flake8_post_args='--ignore=E256,E702,E266,E722,E731,E501,E225,F841,F401,F403,F405' 
-let g:syntastic_python_flake8_post_args='--ignore=E722' 
-let g:syntastic_python_pep8_args='--ignore=E722' 
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 1
-let g:syntastic_check_on_open = 1
-let g:syntastic_check_on_wq = 0
-"set statusline+=%#warningmsg#
-"set statusline+=%{SyntasticStatuslineFlag()}
-"set statusline+=%*
-
-" Toggle paste mode on and off
-map <leader>pp :setlocal paste!<cr>
-
-nnoremap <silent> <F5> :SyntasticCheck<CR>  
+" Autopairs Settings
+let g:AutoPairsShortcutToggle = '<Leader>m'
 
 " NERDTree Settings
+let NERDTreeHijackNetrw=1
 let g:NERDTreeWinPos="right"
 let g:NERDTreeWinSize=35
 let NERDTreeShowHidden=0
 let NERDTreeIgnore=['\.pyc$', '__pycache__']
 noremap <leader>nn :NERDTreeToggle<CR>
 
-" BufExplorer Settings 
+" BufExplorer Settings
 let g:bufExplorerDefaultHelp=0
 let g:bufExplorerShowRelativePath=1
 let g:bufExplorerFindActive=1
 let g:bufExplorerSortBy='name'
 map <leader>o :BufExplorer<cr>
 map <leader>ba :bufdo bd<cr>
-map <leader>bd :Bclose<cr>:tabclose<cr>gT 
+map <leader>bd :Bclose<cr>:tabclose<cr>gT
 
 " Window Navigation
 noremap <c-j> <C-W>j
 noremap <c-k> <C-W>k
 noremap <c-h> <C-W>h
 noremap <c-l> <C-W>l
+noremap <C-=> <C-W>=
 
 " Bash keys for command line
 cnoremap <C-A> <Home>
 cnoremap <C-E> <End>
 cnoremap <C-K> <C-U>
 
-" Delete trailing white space 
-fun! CleanExtraSpaces()
-    let save_cursor = getpos(".")
-    let old_query = getreg('/')
-    silent! %s/\s\+$//e
-    call setpos('.', save_cursor)
-    call setreg('/', old_query)
-endfun
+" Delete trailing white space
+autocmd BufWritePre * :%s/\s\+$//e
 
-if has ("autocmd")
-    autocmd BufWritePre *.txt,*.js,*.py,*.wiki,*.sh,*.coffee :call CleanExtraSpaces() 
-endif
+" Ale settings
+let g:ale_fixers = {
+    \'javascript': ['eslint'],
+    \'python': ['flake8'],
+\}
 
-" Python Syntax Settings 
+" Python Syntax Settings
 let python_highlight_all = 1
 au FileType python syn keyword pythonDecorator True None False self
 au BufNewFile,BufRead *.jinja set syntax=htmljinja
 au BufNewFile,BufRead *.mako set ft=mako
-au FileType python inoremap <buffer> $r return 
-au FileType python inoremap <buffer> $i import 
-au FileType python inoremap <buffer> $p print 
-au FileType python inoremap <buffer> $f #--- <esc>a
 map <buffer> F :set foldmethod=indent<cr>
-map <buffer> M :set foldmethod=manual<cr>
-au FileType python map <buffer> <leader>1 /class 
-au FileType python map <buffer> <leader>2 /def 
-au FileType python map <buffer> <leader>C ?class 
-au FileType python map <buffer> <leader>D ?def 
 au FileType python set cindent
 au FileType python set cinkeys-=0#
 au FileType python set indentkeys-=0#
