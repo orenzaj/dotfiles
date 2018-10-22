@@ -1,0 +1,42 @@
+#!/bin/bash
+
+######## ------ PYENV SET UP --------- ##########
+## This installation script is inspired by 
+## https://www.tecmint.com/pyenv-install-and-manage-multiple-python-versions-in-linux/ 
+####### ------------------------------ ##########
+
+# Install pre-requisite
+sudo apt install -qqy curl git-core gcc make zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev libssl-dev
+
+# Set environment variable if not set.
+if [[ -z "$PYENV_ROOT" ]]; then 
+    export PYENV_ROOT='$HOME/.pyenv'
+    echo -e "\nSetting PYENV_ROOT to $PYENV_ROOT."
+else
+    echo -e "\n\$PYENV_ROOT already set."
+fi
+
+# Add environment variable to path if not set.
+if [[ ":$PATH:" == *":$PYENV_ROOT/bin:"* ]]; then
+    export PATH='$PYENV_ROOT/bin:$PATH'
+    echo -e "Adding $PYENV_ROOT/bin to PATH"
+else
+    echo -e "\$PYENV_ROOT/bin already in PATH"
+fi
+
+# Enable shims 
+if command -v pyenv 1>/dev/null 2>&1; then
+  eval "$(pyenv init -)"
+fi
+
+# Clone the pyenv repo if directory doesn't exist.
+if [ ! -d "$PYENV_ROOT" ] ; then
+    git clone https://github.com/pyenv/pyenv.git $PYENV_ROOT
+fi
+
+# Clone the pyenv virtualenv repo if directory doesn't exist.
+if [ ! -d "$PYENV_ROOT/plugins/pyenv-virtualenv" ] ; then
+    git clone https://github.com/yyuu/pyenv-virtualenv.git $PYENV_ROOT/plugins/pyenv-virtualenv
+fi
+echo "pyenv installation complete."
+
