@@ -14,64 +14,61 @@ au BufReadPost * if line("'\"") > 0|if line("'\"") <= line("$")|exe("norm '\"")|
 " VimPlug Settings
 call plug#begin('~/.vim/plugged')
     Plug 'airblade/vim-gitgutter'
-    Plug 'ggreer/the_silver_searcher'
-    Plug 'mileszs/ack.vim'
-    Plug 'jlanzarotta/bufexplorer'
-    Plug 'rafi/awesome-vim-colorschemes'
-    Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
-    Plug 'tpope/vim-eunuch'
-    Plug 'tpope/vim-surround'
-    Plug 'tpope/vim-repeat'
-    Plug 'tpope/vim-obsession'
-    Plug 'tpope/vim-fugitive'
-    Plug 'tpope/vim-commentary'
-    Plug 'vim-scripts/RecentFiles'
-    Plug 'itchyny/lightline.vim'
-    Plug 'natebosch/vim-lsc'
-    Plug 'inkarkat/vim-mark'
-    Plug 'inkarkat/vim-ingo-library'
-    Plug 'python-rope/ropevim'
     Plug 'dyng/ctrlsf.vim'
-    Plug 'terryma/vim-multiple-cursors'
-    Plug 'roxma/vim-tmux-clipboard'
-    Plug 'will133/vim-dirdiff'
-    Plug 'vim-scripts/TeTrIs.vim'
-    Plug 'tpope/vim-vinegar'
-    Plug 'mattn/emmet-vim/'
+    Plug 'ggreer/the_silver_searcher'
     Plug 'jiangmiao/auto-pairs'
+    Plug 'jlanzarotta/bufexplorer'
+    Plug 'mileszs/ack.vim'
+    Plug 'rafi/awesome-vim-colorschemes'
+    Plug 'roxma/vim-tmux-clipboard'
+    Plug 'sheerun/vim-polyglot'
     Plug 'simeji/winresizer'
+    Plug 'terryma/vim-multiple-cursors'
+    Plug 'vim-airline/vim-airline'
+    Plug 'tpope/vim-commentary'
+    Plug 'tpope/vim-fugitive'
+    Plug 'tpope/vim-sensible'
+    Plug 'tpope/vim-surround'
+    Plug 'tpope/vim-obsession'
+    Plug 'tpope/vim-repeat'
+    Plug 'tpope/vim-vinegar'
+    Plug 'vim-airline/vim-airline-themes'
+    Plug 'vim-scripts/RecentFiles'
     Plug 'w0rp/ale'
+    Plug 'edkolev/tmuxline.vim'
 call plug#end()
 
 set termguicolors
 if !has('gui_running')
     set t_Co=256
 endif
-set background=dark
-colorscheme PaperColor
+colorscheme deus
 
-let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
-let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
-
+if &term =~# '^screen'
+    let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+    let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+endif
 
 " TABS
-set guioptions-=e
-set noshowmode
+syntax on
 set expandtab
-set tabstop=4
-set shiftwidth=4
-set softtabstop=4
-set noswapfile
-set number
-set relativenumber
-set incsearch
+set guioptions-=e
 set hlsearch
 set ignorecase
-set smartcase
-set showmatch
+set incsearch
 set magic
+set nocompatible
 set noerrorbells
+set noshowmode
+set noswapfile
 set novisualbell
+set number
+set relativenumber
+set shiftwidth=4
+set showmatch
+set smartcase
+set softtabstop=4
+set tabstop=4
 
 " Leaders
 let mapleader=";"
@@ -80,13 +77,14 @@ let g:mapleader=";"
 " Fast save
 nnoremap <leader>w :w!<cr>
 
+" Set foldmethod
+nnoremap <leader>z :set foldmethod=indent<cr>
+
 " Vim Copy settings
 set clipboard=unnamed,unnamedplus
 vmap <leader>yy "+y
 nmap <leader>pp "+p
-
-" Toggle paste mode on and off
-map <leader><leader>p :setlocal paste!<cr>
+map <leader>p :setlocal paste!<cr>
 
 " :W sudo saves
 command! W w !sudo tee % > /dev/null
@@ -99,12 +97,13 @@ noremap <c-space> ?
 if executable('ag')
   let g:ackprg = 'ag --vimgrep --smart-case'
 endif
-
-" Ack settings
 cnoreabbrev Ack Ack!
 map <leader>a :Ack<CR>
 vnoremap <Leader>a y:Ack <C-r>=fnameescape(@")<CR><CR>")
 vnoremap <Leader>f y:AckFile! <C-r>=fnameescape(@")<CR><CR>")
+
+" CtrlSF settings
+vmap <Leader>s <Plug>CtrlSFVwordPath <CR>
 
 " Disable search highlights, location list, quickfix list
 noremap <silent> <leader><esc> :noh <bar> lcl <bar> ccl<cr>
@@ -118,46 +117,24 @@ nmap <leader>f :call RecentFilesList()<cr>
 " Split Lines
 nnoremap K i<CR><Esc>
 
-" Light Line (statusline)
+" Airline Settings (statusline)
 set laststatus=2
-
-let g:PaperColor_Theme_Options = {
-  \   'language': {
-  \     'python': {
-  \       'highlight_builtins' : 1
-  \     },
-  \     'cpp': {
-  \       'highlight_standard_library': 1
-  \     },
-  \     'c': {
-  \       'highlight_builtins' : 1
-  \     }
-  \   }
-  \ }
-let g:lightline = {
-            \ 'colorscheme': 'PaperColor',
-            \ 'component_function': {
-            \   'filename': 'LightLineFilename'
-            \ },
-            \ 'active': {
-            \   'left': [ [ 'mode', 'paste',  ], [ 'readonly', 'relativepath', 'modified' ] ],
-            \ }
-            \ }
-function! LightLineFilename()
-    return expand('%:F')
-endfunction
-
+let g:airline_powerline_fonts = 1
+let g:airline_theme='deus'
 
 " Autopairs Settings
 let g:AutoPairsShortcutToggle = '<Leader>m'
 
-" NERDTree Settings
-let NERDTreeHijackNetrw=1
-let g:NERDTreeWinPos="right"
-let g:NERDTreeWinSize=35
-let NERDTreeShowHidden=0
-let NERDTreeIgnore=['\.pyc$', '__pycache__']
-noremap <leader>nn :NERDTreeToggle<CR>
+" Vim Vinegar settings
+augroup netrw_keychange
+    autocmd!
+    autocmd filetype netrw call NetrwMapping()
+augroup END
+function! NetrwMapping()
+    setl bufhidden=wipe
+    noremap <buffer><leader>nn :bd<CR>
+    noremap <buffer>q :bd<CR>
+endfunction
 
 " BufExplorer Settings
 let g:bufExplorerDefaultHelp=0
@@ -185,16 +162,11 @@ autocmd BufWritePre * :%s/\s\+$//e
 
 " Ale settings
 let g:ale_fixers = {
-    \'javascript': ['eslint'],
-    \'python': ['flake8'],
+    \'javascript': ['prettier', 'eslint'],
+    \'python': ['isort', 'autopep8'],
 \}
+let g:ale_fix_on_save = 1
 
 " Python Syntax Settings
 let python_highlight_all = 1
 au FileType python syn keyword pythonDecorator True None False self
-au BufNewFile,BufRead *.jinja set syntax=htmljinja
-au BufNewFile,BufRead *.mako set ft=mako
-map <buffer> F :set foldmethod=indent<cr>
-au FileType python set cindent
-au FileType python set cinkeys-=0#
-au FileType python set indentkeys-=0#

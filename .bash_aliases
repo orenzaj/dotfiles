@@ -42,7 +42,6 @@ alias spiderrun="spiderclean && spiderenv && scrapy runspider apts247/spiders/24
 alias spiderclean="cd ~/git/spider/src/apts247/apts247/staticfiles && rm -rf *"
 alias spiderls="cd ~/git/spider/src/apts247/apts247/staticfiles && find . -name '*.html' | sort"
 
-
 # Celery Debugger
 alias rdb="telnet localhost 6900"
 
@@ -52,21 +51,25 @@ alias pyclean='find . -type f -name "*.py[co]" -exec rm -f \{\} \;'
 alias speedtest="curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python -"
 alias whatsmyip="dig +short myip.opendns.com @resolver1.opendns.com"
 alias xclip-grab="xclip -i -selection clipboard"
+
 # Git
 alias gits="git status -sb"
 alias gitm="gits | grep ' M '"
 alias gitu="gits | grep '?? '"
 alias gitb="gits | grep \"AA\|MM\|UU\""
 alias gitd="gits | grep -E \"D\\s\""
+
 # Untracked
 alias gitau="gitu | awk '{print \"git add \"\$2}' | sh"
 alias gitab="gitb | awk '{print \"git add \"\$2}' | sh"
 alias gitcou="gitu | awk '{print \"git checkout \-\- \"\$2}' | sh"
 alias gitrmu="gitu | awk '{print \"rm -rf \"\$2}' | sh"
+
 # Modified
 alias gitam="gitm | awk '{print \"git add \"\$2}' | sh"
 alias gitcom="gitm | awk '{print \"git checkout \"\$2}' | sh"
 alias gitrmm="gitm | awk '{print \"rm \"\$2}' | sh"
+
 # All
 alias gitaa="gits | awk '{print \"git add \"\$2}' | sh"
 alias gitcoa="gits | awk '{print \"git checkout \-\- \"\$2}' | sh"

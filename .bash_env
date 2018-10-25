@@ -1,0 +1,15 @@
+# Disables the extra env variable printing.
+if [[ $(uname -s) == Linux  ]]
+then
+    export VIRTUAL_ENV_DISABLE_PROMPT=1
+else
+    unset DYLD_LIBRARY_PATH
+fi
+
+export CPPFLAGS="-P"
+
+# Git
+export GIT_PROMPT_ONLY_IN_REPO=1
+export GIT_PS1_SHOWCOLORHINTS=true
+export GIT_PS1_SHOWDIRTYSTATE=1
+
