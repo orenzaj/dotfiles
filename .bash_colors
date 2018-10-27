@@ -1,0 +1,11 @@
+### COLORS ###
+bold=$(tput bold)
+normal=$(tput sgr0)
+reset=$(tput setaf 0)
+red=$(tput setaf 1)
+green=$(tput setaf 2)
+orange=$(tput setaf 3)
+blue=$(tput setaf 4)
+purple=$(tput setaf 5)
+turquoise=$(tput setaf 6)
+grey=$(tput setaf 7)

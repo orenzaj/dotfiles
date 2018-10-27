@@ -1,0 +1,10 @@
+# Go
+export GOPATH=$HOME/go
+export GOBIN=$GOPATH/bin
+
+# Main
+export PATH=$PATH:/usr/local/go/bin:$HOME/.local/bin:$GOBIN
+
+# Etc
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"/usr/local/lib"
+
