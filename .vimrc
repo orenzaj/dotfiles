@@ -42,7 +42,7 @@ set termguicolors
 if !has('gui_running')
     set t_Co=256
 endif
-colorscheme deus
+colorscheme dracula
 
 if &term =~# '^screen'
     let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
@@ -120,7 +120,7 @@ nnoremap K i<CR><Esc>
 " Airline Settings (statusline)
 set laststatus=2
 let g:airline_powerline_fonts = 1
-let g:airline_theme='deus'
+let g:airline_theme='dracula'
 
 " Autopairs Settings
 let g:AutoPairsShortcutToggle = '<Leader>m'
