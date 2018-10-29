@@ -1,21 +1,40 @@
 ### PROMPT ###
-topborder="\n\[${bold}\]\[${orange}\]\342\224\215"
-mainprompt="[\[${normal}\]\[${red}\]\u@\H: \w\[${bold}\]\[${orange}\]]\[${normal}\]"
-bottomborder="\n\[${bold}\]\[${orange}\]\342\224\225▶"
-bottomprompt=" \[${normal}\]"
+main_text="\[\u@\h: \w\]"
+env_text="`basename ${VIRTUAL_ENV}`"
+open_bracket="\[[\]"
+close_braket="\[]\]"
+side_top_char="\[\342\224\215\]"
+side_bottom_char="\[\342\224\225\]"
+end_char="\[→ \]"
+new_line="\[\n\]"
+
+bracket_color="\[${bold}${orange}\]"
+main_color="\[${purple}\]"
+git_color="\[${turquoise}\]"
+env_color="\[${green}\]"
+
+b_close="\[${bracket_color}${close_braket}${normal}\]"
+b_open="\[${bracket_color}${open_bracket}${normal}\]"
+s_top="\[${new_line}${bracket_color}${side_top_char}\]"
+s_bottom="\[${new_line}${bracket_color}${side_bottom_char}\]"
+end_prompt="\[${end_char}${normal}\]"
+
+topborder="\[${s_top}${b_open}\]"
+mainprompt="\[${main_color}${main_text}${b_close}\]"
+bottomprompt="\[${s_bottom}${end_prompt}\]"
 
 ve() {
-    if [ ${VIRTUAL_ENV}  ] ; then
-        printf "${bold}${orange}[${normal}${turquoise}`basename \"${VIRTUAL_ENV}\"`${bold}${orange}]${normal}"
+    if [ ${VIRTUAL_ENV}  ]; then
+        printf ${b_open}${env_color}${env_text}${b_close}
     fi
 }
 
 gp(){
-    __git_ps1 "[%s]" | sed -e "s/^\[/$(printf ${bold}${orange}\[${normal}${green})/" -e "s/]/$(printf ${bold}${orange}]${normal})/"
+    __git_ps1 ${b_open}${git_color}%s${b_close}
 }
 
 PS1=${topborder}${mainprompt}
-PS1+='$(ve)'
-PS1+='$(gp)'
-PS1+=${bottomborder}${bottomprompt}
+PS1+=$(ve)
+PS1+=$(gp)
+PS1+=${bottomprompt}
 export PS1
