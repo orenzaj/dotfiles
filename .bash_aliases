@@ -46,7 +46,12 @@ alias spiderls="cd ~/git/spider/src/apts247/apts247/staticfiles && find . -name 
 alias rdb="telnet localhost 6900"
 
 # Misc
-alias ls='gls --group-directories-first --color=auto'
+# Disables the extra env variable printing.
+if [[ $(uname -s) == Linux  ]]; then
+    alias ls='ls --group-directories-first --color=auto'
+else
+    alias ls='gls --group-directories-first --color=auto'
+fi
 alias pyclean='find . -type f -name "*.py[co]" -exec rm -f \{\} \;'
 alias speedtest="curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python -"
 alias whatsmyip="dig +short myip.opendns.com @resolver1.opendns.com"
