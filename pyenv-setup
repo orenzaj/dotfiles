@@ -36,8 +36,11 @@ fi
 
 # Enable shims
 if command -v pyenv 1>/dev/null 2>&1; then
-  eval "$(pyenv init -)"
+    eval "$(pyenv init -)"
+fi
+if ! grep -q "pyenv()" $HOME/.bash_shims; then
+    echo "eval $(pyenv init -)" >> $HOME/.mybashrc
 fi
 
 echo "pyenv installation complete."
-exec "$SHELL"
+source $HOME/.mybashrc

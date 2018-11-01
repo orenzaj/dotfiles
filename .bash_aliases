@@ -71,7 +71,7 @@ alias gitcom="gitm | awk '{print \"git checkout \"\$2}' | sh"
 alias gitrmm="gitm | awk '{print \"rm \"\$2}' | sh"
 
 # All
-alias gitaa="gits | awk '{print \"git add \"\$2}' | sh"
+alias gitaa="gits | grep -v \# | awk '{print \"git add \"\$2}' | sh"
 alias gitcoa="gits | awk '{print \"git checkout \-\- \"\$2}' | sh"
 alias gitrma="gits | awk '{print \"rm\"\$2}' | sh"
 alias gitrmd="gitd | awk '{print \"git rm \"\$2}' | sh"
