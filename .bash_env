@@ -1,6 +1,5 @@
 # Disables the extra env variable printing.
-if [[ $(uname -s) == Linux  ]]
-then
+if [[ $(uname -s) == Linux  ]]; then
     export VIRTUAL_ENV_DISABLE_PROMPT=1
 else
     unset DYLD_LIBRARY_PATH
