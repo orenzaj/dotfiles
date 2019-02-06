@@ -1,3 +1,7 @@
+# NeoVim
+ONI_NEOVIM_PATH=/home/jorenza/Downloads/neovim/nvim.appimage
+export ONI_NEOVIM_PATH
+
 # Go
 export GOPATH=$HOME/go
 export GOBIN=$GOPATH/bin

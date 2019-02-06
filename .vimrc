@@ -5,6 +5,9 @@ if empty(glob('~/.vim/autoload/plug.vim'))
     autocmd VimEnter * PlugInstall
 endif
 
+" Set another cmspath to search with gf
+set path+=/home/jorenza/git/cms/src/247/**
+
 " Save vim info
 set viminfo+=! " make sure it can save viminfo
 
@@ -14,6 +17,8 @@ au BufReadPost * if line("'\"") > 0|if line("'\"") <= line("$")|exe("norm '\"")|
 " VimPlug Settings
 call plug#begin('~/.vim/plugged')
     Plug 'airblade/vim-gitgutter'
+    Plug 'airblade/vim-rooter'
+    Plug 'aldantas/vim-custom-surround'
     Plug 'dyng/ctrlsf.vim'
     Plug 'ggreer/the_silver_searcher'
     Plug 'jiangmiao/auto-pairs'
@@ -35,19 +40,8 @@ call plug#begin('~/.vim/plugged')
     Plug 'vim-airline/vim-airline-themes'
     Plug 'vim-scripts/RecentFiles'
     Plug 'w0rp/ale'
-    Plug 'edkolev/tmuxline.vim'
+    Plug 'airblade/vim-rooter'
 call plug#end()
-
-set termguicolors
-if !has('gui_running')
-    set t_Co=256
-endif
-colorscheme dracula
-
-if &term =~# '^screen'
-    let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
-    let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
-endif
 
 " TABS
 syntax on
@@ -70,6 +64,20 @@ set smartcase
 set softtabstop=4
 set tabstop=4
 
+let g:dracula_italic = 0
+colorscheme dracula
+highlight Normal ctermbg=None
+
+if !has('gui_running')
+    set termguicolors
+    set t_Co=256
+endif
+
+if &term =~# '^screen'
+    let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+    let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+endif
+
 " Leaders
 let mapleader=";"
 let g:mapleader=";"
@@ -77,14 +85,24 @@ let g:mapleader=";"
 " Fast save
 nnoremap <leader>w :w!<cr>
 
+" Toggle number and relative number
+noremap <leader>n :call ToggleNumber()<cr>
+function! ToggleNumber()
+    set number!
+    set relativenumber!
+endfunction
+
+
 " Set foldmethod
-nnoremap <leader>z :set foldmethod=indent<cr>
+noremap <leader>z :set foldmethod=indent<cr>
 
 " Vim Copy settings
 set clipboard=unnamed,unnamedplus
 vmap <leader>yy "+y
 nmap <leader>pp "+p
-map <leader>p :setlocal paste!<cr>
+
+" Toggle paste mode
+nmap <leader>p :setlocal paste!<cr>"
 
 " :W sudo saves
 command! W w !sudo tee % > /dev/null
@@ -98,9 +116,12 @@ if executable('ag')
   let g:ackprg = 'ag --vimgrep --smart-case'
 endif
 cnoreabbrev Ack Ack!
+cnoreabbrev ack Ack!
 map <leader>a :Ack<CR>
 vnoremap <Leader>a y:Ack <C-r>=fnameescape(@")<CR><CR>")
 vnoremap <Leader>f y:AckFile! <C-r>=fnameescape(@")<CR><CR>")
+vnoremap <Leader>gf <C-W>vf
+
 
 " CtrlSF settings
 vmap <Leader>s <Plug>CtrlSFVwordPath <CR>
@@ -132,7 +153,6 @@ augroup netrw_keychange
 augroup END
 function! NetrwMapping()
     setl bufhidden=wipe
-    noremap <buffer><leader>nn :bd<CR>
     noremap <buffer>q :bd<CR>
 endfunction
 
@@ -161,11 +181,22 @@ cnoremap <C-K> <C-U>
 autocmd BufWritePre * :%s/\s\+$//e
 
 " Ale settings
+let g:ale_linters = {
+    \'javascript': ['prettier', 'eslint'],
+    \'python': ['flake8', 'autopep8', 'isort']
+\}
 let g:ale_fixers = {
     \'javascript': ['prettier', 'eslint'],
-    \'python': ['isort', 'autopep8'],
+    \'python': ['flake8', 'autopep8', 'isort']
 \}
-let g:ale_fix_on_save = 1
+let g:ale_fix_on_save = 0
+let g:rooter_change_directory_for_non_project_files = 'current'
+
+" Surround settings
+call customsurround#map('<Leader>cl', 'console.log({\ ', '\ });')
+call customsurround#map('<Leader>ch', '\%V')
+
+set grepprg=rg\ --vimgrep
 
 " Python Syntax Settings
 let python_highlight_all = 1
