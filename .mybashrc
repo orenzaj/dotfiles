@@ -50,9 +50,6 @@ if [ -f ~/.bash_aliases ]; then . ~/.bash_aliases ; fi
 # Colors
 if [ -f ~/.bash_colors ]; then . ~/.bash_colors ; fi
 
-# Vi-maps
-if [ -f ~/.bash_vi ]; then . ~/.bash_vi ; fi
-
 # Paths
 if [ -f ~/.bash_paths ]; then . ~/.bash_paths ; fi
 

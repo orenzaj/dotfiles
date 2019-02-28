@@ -68,6 +68,9 @@ if [[ $(uname -s) == Linux  ]]; then
 else
     alias ls='gls --group-directories-first --color=auto'
 fi
+if [ -x "$(which nvim)"  ]; then
+    alias vim='nvim'
+fi
 alias pyclean='find . -type f -name "*.py[co]" -exec rm -f \{\} \;'
 alias speedtest="curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python -"
 alias whatsmyip="dig +short myip.opendns.com @resolver1.opendns.com"
