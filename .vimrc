@@ -15,10 +15,10 @@ call plug#begin('~/.vim/plugged')
     Plug 'airblade/vim-gitgutter'
     Plug 'aldantas/vim-custom-surround'
     Plug 'dyng/ctrlsf.vim'
-    Plug 'ggreer/the_silver_searcher'
     Plug 'jiangmiao/auto-pairs'
     Plug 'jlanzarotta/bufexplorer'
-    Plug 'mileszs/ack.vim'
+	Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+	Plug 'junegunn/fzf.vim'
     Plug 'rafi/awesome-vim-colorschemes'
     Plug 'roxma/vim-tmux-clipboard'
     Plug 'sheerun/vim-polyglot'
@@ -43,6 +43,7 @@ call plug#end()
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set viminfo+=!
 au BufReadPost * if line("'\"") > 0|if line("'\"") <= line("$")|exe("norm '\"")|else|exe "norm $"|endif|endif|call RecentFilesAdd()
+nmap <leader>rf :call RecentFilesList()<cr>
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -51,6 +52,7 @@ au BufReadPost * if line("'\"") > 0|if line("'\"") <= line("$")|exe("norm '\"")|
 set nocompatible
 set noshowmode
 set noswapfile
+set encoding=utf-8
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -72,10 +74,22 @@ set smartcase
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Tabs
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-set expandtab
-set shiftwidth=4
-set softtabstop=4
+" au BufNewFile,BufRead *.py
 set tabstop=4
+set softtabstop=4
+set shiftwidth=4
+"     \ set textwidth=79
+"     " \ set expandtab
+"     " \ set autoindent
+"     \ set fileformat=unix
+" au BufNewFile,BufRead *.js, *.html, *.css
+"     \ set tabstop=2
+"     \ set softtabstop=2
+"     \ set shiftwidth=2
+
+" set smartindent
+" filetype indent on
+
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Bells
@@ -138,7 +152,7 @@ nnoremap <space> za
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Pasting
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-nmap <leader>p :setlocal paste!<cr>"
+nmap <leader>v :setlocal paste!<cr>"
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -149,63 +163,76 @@ nnoremap <leader>w :w!<cr>
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Ack settings
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-cnoreabbrev Ack Ack!
-cnoreabbrev ack Ack!
-map <leader>a :Ack<CR>
-vnoremap <Leader>a y:Ack <C-r>=fnameescape(@")<CR><CR>")
-vnoremap <Leader>f y:AckFile! <C-r>=fnameescape(@")<CR><CR>")
-
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Ag settings
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-if executable('ag')
-  let g:ackprg = 'ag --vimgrep --smart-case'
-endif
-
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " RipGrep settings
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 if executable('rg')
-   let g:ackprg='rg --vimgrep'
+	set grepprg=rg\ --vimgrep
+	set grepformat=%f:%l:%c:%m
 endif
 
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" fzf settings
+" ;g will search for content inside files
+" ;f will search for files
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+nmap <Leader>g :Rg<cr>
+command! -bang -nargs=* Rg
+  \ call fzf#vim#grep(
+  \   'rg --column --line-number --hidden --ignore-case --no-heading --color=always '.shellescape(<q-args>), 1,
+  \   <bang>0 ? fzf#vim#with_preview({'options': '--delimiter : --nth 4..'}, 'up:60%')
+  \           : fzf#vim#with_preview({'options': '--delimiter : --nth 4..'}, 'right:50%:hidden', '?'),
+  \   <bang>0)
+
+nmap <Leader>f :Find<cr>
+command! -bang -nargs=* Find
+  \ call fzf#vim#grep(
+  \	  'rg
+  \ --smart-case
+  \ --max-columns=150
+  \ --files
+  \ --colors=line:none
+  \ --colors=line:style:bold
+  \ --no-ignore
+  \ --hidden
+  \ --follow
+  \ --line-number
+  \ --no-heading
+  \ --fixed-strings
+  \ --ignore-case
+  \ --glob "!.git/*"
+  \ --color "always"'.shellescape(<q-args>).'| tr -d "\017"', 1, <bang>0)
+
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" gf
+" Brian Shenanigans (gf, paths)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-vnoremap <Leader>gf <C-W>vf
-nmap <Leader>bf :BrianOpenFile<cr>
+nmap gf :BrianOpenFile<cr>
+nmap <Leader>p :call BrianPathList()<cr>
 
 command! BrianOpenFile call BrianOpenFile()
 function! BrianOpenFile()
-    try
-        let g:BrianOpenFileName = matchstr(expand("<cfile>"), ".*")
-        execute ':find ' . g:BrianOpenFileName
-    catch /.*/
-        try
-            let g:BrianOpenFileName = expand("<cfile>") . ".js"
-            "echo g:BrianOpenFileName
-            execute ':find ' . g:BrianOpenFileName
-        catch /.*/
-            try
-                let g:BrianOpenFileName = tr(expand("<cfile>"), ".", "/") . ".py"
-                execute ':find ' . g:BrianOpenFileName
-            catch /.*/
-                try
-                    let g:BrianOpenFileName = matchstr(expand("<cfile>"), "[^/].*")
-                    execute ':find ' . g:BrianOpenFileName
-                catch /.*/
-                endtry
-            endtry
-        endtry
-    endtry
-    echo g:BrianOpenFileName
+try
+	let g:BrianOpenFileName = matchstr(expand("<cfile>"), ".*")
+	execute ':find ' . g:BrianOpenFileName
+catch /.*/
+	try
+		let g:BrianOpenFileName = expand("<cfile>") . ".js"
+		execute ':find ' . g:BrianOpenFileName
+	catch /.*/
+		try
+			let g:BrianOpenFileName = tr(expand("<cfile>"), ".", "/") . ".py"
+			execute ':find ' . g:BrianOpenFileName
+		catch /.*/
+			try
+				let g:BrianOpenFileName = matchstr(expand("<cfile>"), "[^/].*")
+				execute ':find ' . g:BrianOpenFileName
+			catch /.*/
+			endtry
+		endtry
+	endtry
+endtry
+"echo g:BrianOpenFileName
 endfunction
-
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Path settings
@@ -219,23 +246,19 @@ set path+=/home/jorenza/git/cms/src/247/templates_backend
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 vmap <Leader>s <Plug>CtrlSFVwordPath <CR>
 
-"
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Hide search highlights, location list,
-" quickfix list
+" Hide search highlights, location list, quickfix list
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 noremap <silent> <leader><esc> :noh <bar> lcl <bar> ccl<cr>
 
-" Switch CWD to path of open buffer
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" " Switch CWD to path of open buffer
+" """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 map <leader>cd :cd %:p:h<cr>:pwd<cr>
 
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Recent Files
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-nmap <leader>f :call RecentFilesList()<cr>
-
-"
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Split Lines
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -322,13 +345,24 @@ let g:ale_fix_on_save = 0
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Custom Surround setting
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let vimCommentStart = repeat('"', 90) . '<C-v><CR>"\ '
-let vimCommentEnd = '<C-v><CR>' . repeat('"', 90)
+let lf = '<C-v><CR>'
+let vimCommentStart = repeat('"', 90) . lf . '"\ '
+let vimCommentEnd = lf . repeat('"', 90)
+let bashCommentStart = repeat('#', 90) . lf . '\ '
+let bashCommentEnd = lf . repeat('#', 90)
+let ppStart = lf . 'from\ pprint\ import\ pprint' . lf . 'pprint('
+let ppEnd = ')' . lf
+let pdb =  'import\ pdb;\ pdb.set_trace()' . lf
+let pdbEnd = ppEnd . pdb
+
+call customsurround#map('<Leader>pp', ppStart, ppEnd)
+call customsurround#map('<Leader>pdb', ppStart, pdbEnd)
 call customsurround#map('<Leader>vc', vimCommentStart, vimCommentEnd)
+call customsurround#map('<Leader>bc', bashCommentStart, bashCommentEnd)
 call customsurround#map('<Leader>cl', 'console.log({\ ', '\ });')
 call customsurround#map('<Leader>ch', '\%V')
 
-"
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Python Syntax Settings
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""

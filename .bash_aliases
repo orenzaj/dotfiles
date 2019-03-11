@@ -1,7 +1,7 @@
 checkEnv(){
-    if [ ${VIRTUAL_ENV}  ]; then
-        deactivate;
-    fi
+	if [ ${VIRTUAL_ENV} ]; then
+		deactivate;
+	fi
 }
 
 # Mongo
@@ -25,7 +25,10 @@ alias cmsimport="stopdockers && dropdb cms && createdb cms && zcat ~/Downloads/c
 alias cmskill="lsof -i:8000 | grep [p]ython | awk '{print \"kill \"\$2}' | sh"
 alias cmsmake="cmsenv && python manage.py makemigrations --noinput"
 alias cmsmigrate="cmsenv && python manage.py migrate --noinput"
-alias cmspath="cd ~/git/cms/src/247"
+alias cmspath="cd ~/git/cms/src/247 && pyclean"
+alias cmsint="cd ~/git/cms/src/247/apps247/integration/"
+alias cmsoutbound="cd ~/git/cms/src/247/apps247/integration/feeds/outbound/"
+alias cmsinbound="cd ~/git/cms/src/247/apps247/integration/feeds/inbound/"
 alias cmsreimport="cmsdb && cmsimport"
 alias cmsstatic="cd ~/git/cms/src/247/staticfiles"
 alias cmslessc="cmsstatic && less-watch-compiler cms/less cms/css cms-new-look.less"
@@ -33,6 +36,7 @@ alias cmsrmmigs="cmspath; gitmig | xargs rm"
 alias cmsserver="cmskill; cmsenv && python manage.py runserver --insecure"
 alias cmsshell="cmsenv && python manage.py shell_plus"
 alias cmsupdate="cmspath && git pull && cmsmake && cmsmigrate"
+alias cmstest="cmsenv && python manage.py"
 
 # Lead Manager
 alias lead-manager="cmspath && cd js_apps/cms/lead_manager/"
@@ -43,7 +47,7 @@ alias lead-manager-less-compile="cmsstatic && cd cms && lessc less/style-2/lead-
 
 # Centerprise
 alias centpath="cd ~/git/centerprise/src/"
-alias centenv="$(checkEnv) source ~/git/centerprise/cent-env/bin/activate"
+# alias centenv="$(checkEnv) source ~/git/centerprise/cent-env/bin/activate"
 alias centsource="source ~/git/centerprise/src/development.sh && docker attach dev-centerprise-cms"
 
 # SecureApplications
