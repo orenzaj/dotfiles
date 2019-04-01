@@ -18,7 +18,25 @@ export PYENV_ROOT=/home/jorenza/.pyenv
 ##########################################################################################
 # FZF
 ##########################################################################################
-export FZF_DEFAULT_COMMAND='rg --smart-case --max-columns=150 --files --colors=line:none --colors=line:style:bold --no-ignore --hidden --follow --line-number --no-heading --fixed-strings --ignore-case --glob "!.git/*" --color "always" "!.git/*" '
+[ -f ~/.fzf.bash  ] && source ~/.fzf.bash
+
+export FZF_DEFAULT_COMMAND='rg
+    \ --colors=line:style:bold
+    \ --color "always" "!.git/*"
+    \ --follow
+    \ --files
+    \ --fixed-strings
+    \ --glob "!{.git,node_modules}/*" 2> /dev/null
+    \ --glob "/home/jorenza/git/cms/src/*"
+    \ --hidden
+    \ --ignore-case
+    \ --line-number
+    \ --max-columns=150
+    \ --no-heading
+    \ --no-ignore
+    \ --smart-case '
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+bind -x '"\C-p": vim $(fzf);'
 
 ##########################################################################################
 # FZF

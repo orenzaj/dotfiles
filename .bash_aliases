@@ -18,7 +18,7 @@ alias stopdockers="docker ps -q | awk '{print \"docker stop \" \$1}' | sh"
 
 # CMS
 alias cmscelery="cmsenv && celery -A celery_init worker --loglevel=debug"
-alias cmsdb="curl http://192.168.86.31/cms.sql.gz -o --create-dirs ~/Downloads/cmsdb/cms.sql.Z"
+alias cmsdb='scp shallowhal:$(ssh shallowhal ls -dt /data/cms*sql* | head -1) /home/jorenza/Downloads/cmsdb/cms.sql.Z'
 alias cmsenv="$(checkEnv) source ~/git/cms/cms-env/bin/activate && cmspath"
 alias cmsinstance="startdockers && centenv && centsource"
 alias cmsimport="stopdockers && dropdb cms && createdb cms && zcat ~/Downloads/cmsdb/cms.sql.Z | psql -f - cms"
@@ -29,7 +29,7 @@ alias cmspath="cd ~/git/cms/src/247 && pyclean"
 alias cmsint="cd ~/git/cms/src/247/apps247/integration/"
 alias cmsoutbound="cd ~/git/cms/src/247/apps247/integration/feeds/outbound/"
 alias cmsinbound="cd ~/git/cms/src/247/apps247/integration/feeds/inbound/"
-alias cmsreimport="cmsdb && cmsimport"
+alias cmsdbupdate="cmsdb && cmsimport"
 alias cmsstatic="cd ~/git/cms/src/247/staticfiles"
 alias cmslessc="cmsstatic && less-watch-compiler cms/less cms/css cms-new-look.less"
 alias cmsrmmigs="cmspath; gitmig | xargs rm"
