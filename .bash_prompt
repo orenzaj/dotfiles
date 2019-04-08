@@ -1,39 +1,57 @@
-### PROMPT ###
-
-# Host
-user() {
-    echo -e "$(tput setaf 9)`whoami`$(tput setaf 255)"
+############################# PROMPT #################################
+######################################################################
+# Current Time
+######################################################################
+ct(){
+    CURRENT_TIME=`date +%X`
+    echo -e "$(tput setaf 255)[$(tput setaf 212)${CURRENT_TIME}$(tput setaf 255)] "
 }
 
-# Host
-host() {
-    echo -e "at $(tput setaf 33)`hostname`$(tput setaf 255)"
+######################################################################
+# Current User
+######################################################################
+cu() {
+    echo -e "$(tput setaf 9)`whoami`$(tput setaf 255) "
 }
 
+######################################################################
+# Current Host
+######################################################################
+ch() {
+    echo -e "at $(tput setaf 33)`hostname`$(tput setaf 255) "
+}
+
+######################################################################
 # Working directory
+######################################################################
 wd() {
-    echo -e "in $(tput setaf 226)`pwd | sed 's/\/home\/jorenza/~/'`$(tput setaf 255)"
+    echo -e "in $(tput setaf 226)`pwd | sed 's/\/home\/jorenza/\\~/'`$(tput setaf 255) "
 }
 
+######################################################################
 # Virtual Env
+######################################################################
 ve() {
     if [ ${VIRTUAL_ENV}  ]; then
-        CURRENT_ENV=`basename ${VIRTUAL_ENV}`
-        echo -e "$(tput setaf 255)($(tput setaf 33)${CURRENT_ENV}$(tput setaf 255))"
-    else
-        echo ""
+        echo -e "$(tput setaf 255)($(tput setaf 48)`basename ${VIRTUAL_ENV}`$(tput setaf 255)) "
     fi
 }
 
+######################################################################
 # Git branch
-gp(){
+######################################################################
+gb(){
     BRANCH=`__git_ps1 %s`
-	if [ ! "${BRANCH}" == "" ]
-	then
-        prefix=`echo -e "$(tput setaf 255)on"`
-        echo -e "${prefix} $(tput setaf 135)${BRANCH}"
+	if [ ! "${BRANCH}" == "" ]; then
+        echo -e "on $(tput setaf 135)${BRANCH}$(tput setaf 255) "
 	fi
 }
 
-# export PS1="\[\e[m\][\[\e[35m\]\@\[\e[m\]] \[\e[31m\]\u\[\e[m\] at \[\e[32m\]\h\[\e[m\]\`wd\`\`ve\` \`gp\` \n\[\e[35m\] ➜ \[\e[m\]"
-export PS1="\[\e[m\][\[\e[35m\]\@\[\e[m\]] \`user\` \`host\` \`wd\`\`ve\` \`gp\` \n\[\e[35m\] ➜ \[\e[m\]"
+######################################################################
+# Second line
+######################################################################
+sl(){
+    echo -e "\n\r$(tput setaf 69)➜ $(tput setaf 255)"
+}
+
+export PS1="\`ct\`\`cu\`\`ch\`\`wd\`\`ve\`\`gb\`\`sl\`"
