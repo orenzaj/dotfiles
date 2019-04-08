@@ -1,5 +1,5 @@
 #!/bin/bash
-DOTFILES=$(ls -al | grep '^-' | grep -v "install" | awk '{print "find `pwd` -name "$9}' | sh)
+DOTFILES=$(ls -al | grep '^-' | grep -v "install" | grep -v "py" | awk '{print "find `pwd` -name "$9}' | sh)
 for dotfile in ${DOTFILES}; do
     DOTHOME=$HOME/$(echo $dotfile | awk -F/ '{print $NF}')
     if [ -f $DOTHOME ]; then

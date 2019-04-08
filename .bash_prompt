@@ -1,39 +1,39 @@
 ### PROMPT ###
-main_text="\[\u@\h: \w\]"
-open_bracket="["
-close_braket="]"
-side_top_char='\[\342\224\215\]'
-side_bottom_char='\[\342\224\225\]'
-end_char="→ "
-new_line='\[\n\]'
 
-bracket_color="$bold$orange"
-main_color="$purple"
-git_color="$turquoise"
-env_color="$green"
+# Host
+user() {
+    echo -e "$(tput setaf 9)`whoami`$(tput setaf 255)"
+}
 
-b_close="$bracket_color$close_braket$normal"
-b_open="$bracket_color$open_bracket$normal"
-s_top="$new_line$bracket_color$side_top_char"
-s_bottom="$new_line$bracket_color$side_bottom_char"
-end_prompt="$end_char$normal"
+# Host
+host() {
+    echo -e "at $(tput setaf 33)`hostname`$(tput setaf 255)"
+}
 
-topborder="$s_top$b_open"
-mainprompt="$main_color$main_text$b_close"
-bottomprompt="$s_bottom$end_prompt"
+# Working directory
+wd() {
+    echo -e "in $(tput setaf 226)`pwd | sed 's/\/home\/jorenza/~/'`$(tput setaf 255)"
+}
 
+# Virtual Env
 ve() {
     if [ ${VIRTUAL_ENV}  ]; then
-        printf ${b_open}${env_color}`basename ${VIRTUAL_ENV}`${b_close}
+        CURRENT_ENV=`basename ${VIRTUAL_ENV}`
+        echo -e "$(tput setaf 255)($(tput setaf 33)${CURRENT_ENV}$(tput setaf 255))"
+    else
+        echo ""
     fi
 }
 
+# Git branch
 gp(){
-   __git_ps1 ${b_open}${git_color}%s${b_close}
+    BRANCH=`__git_ps1 %s`
+	if [ ! "${BRANCH}" == "" ]
+	then
+        prefix=`echo -e "$(tput setaf 255)on"`
+        echo -e "${prefix} $(tput setaf 135)${BRANCH}"
+	fi
 }
 
-PS1=${topborder}${mainprompt}
-# PS1+=$(ve)
-# PS1+='$(gp)'
-PS1+=${bottomprompt}
-export PS1
+# export PS1="\[\e[m\][\[\e[35m\]\@\[\e[m\]] \[\e[31m\]\u\[\e[m\] at \[\e[32m\]\h\[\e[m\]\`wd\`\`ve\` \`gp\` \n\[\e[35m\] ➜ \[\e[m\]"
+export PS1="\[\e[m\][\[\e[35m\]\@\[\e[m\]] \`user\` \`host\` \`wd\`\`ve\` \`gp\` \n\[\e[35m\] ➜ \[\e[m\]"

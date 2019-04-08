@@ -19,13 +19,14 @@ call plug#begin('~/.vim/plugged')
     Plug 'edkolev/tmuxline.vim'
     Plug 'jiangmiao/auto-pairs'
     Plug 'jlanzarotta/bufexplorer'
-	Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-	Plug 'junegunn/fzf.vim'
+    Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+    Plug 'junegunn/fzf.vim'
     Plug 'roxma/vim-tmux-clipboard'
     Plug 'sheerun/vim-polyglot'
     Plug 'simeji/winresizer'
     Plug 'terryma/vim-multiple-cursors'
     Plug 'vim-airline/vim-airline'
+    Plug 'skammer/vim-css-color'
     Plug 'tpope/vim-commentary'
     Plug 'tpope/vim-fugitive'
     Plug 'tpope/vim-sensible'
@@ -33,7 +34,8 @@ call plug#begin('~/.vim/plugged')
     Plug 'tpope/vim-obsession'
     Plug 'tpope/vim-repeat'
     Plug 'tpope/vim-vinegar'
-    " Plug 'vim-airline/vim-airline-themes'
+    Plug 'vim-airline/vim-airline-themes'
+    Plug 'Yggdroot/indentLine'
     " Plug 'vim-scripts/RecentFiles'
     Plug 'w0rp/ale'
 call plug#end()
@@ -79,7 +81,6 @@ set tabstop=4
 set softtabstop=4
 set shiftwidth=4
 set expandtab
-
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Bells
@@ -203,18 +204,20 @@ let g:tmuxline_preset = {
             \'z'    : '#H', }
 let g:tmuxline_separators = {
             \ 'left' : '',
-            \ 'left_alt': '>',
+            \ 'left_alt': '⮀',
             \ 'right' : '',
-            \ 'right_alt' : '<',
+            \ 'right_alt' : '⮂',
             \ 'space' : ' '}
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Airline Settings (statusline)
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set laststatus=2
 let g:airline_powerline_fonts = 1
-" let g:airline_statusline_ontop = 1
 let g:airline_theme='dracula'
+let g:airline#extensions#tmuxline#enabled = 1
+let airline#extensions#tmuxline#color_template = 'visual'
+let airline#extensions#tmuxline#snapshot_file = "/home/jorenza/.tmuxline.conf"
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -240,7 +243,7 @@ endfunction
 " Folding
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set foldmethod=indent
-set foldlevel=99
+set foldlevel=1
 nnoremap <space> za
 
 
@@ -275,35 +278,48 @@ endif
 nmap <Leader>a :Rg <C-R><C-W><CR>
 command! -bang -nargs=* Rg
   \ call fzf#vim#grep(
-  \   'rg --column --line-number --hidden --no-heading --color=always '.shellescape(<q-args>), 1,
+  \ 'rg
+  \ --column
+  \ --hidden
+  \ --ignore-case
+  \ --line-number
+  \ --no-heading
+  \ --color=always '.shellescape(<q-args>), 1,
   \   <bang>0 ? fzf#vim#with_preview({'options': '--delimiter : --nth 4..'}, 'up:60%')
-  \           : fzf#vim#with_preview({'options': '--delimiter : --nth 4..'}, 'right:50%', '?'),
+  \           : fzf#vim#with_preview({'options': '--delimiter : --nth 4..'}, 'right:50%:hidden', '?'),
   \   <bang>0)
 
 nmap <Leader>g :Rg <cr>
 command! -bang -nargs=* Rg
   \ call fzf#vim#grep(
-  \   'rg --column --line-number --hidden --ignore-case --no-heading --color=always '.shellescape(<q-args>), 1,
-  \   <bang>0 ? fzf#vim#with_preview({'options': '--delimiter : --nth 4..'}, 'up:60%')
-  \           : fzf#vim#with_preview({'options': '--delimiter : --nth 4..'}, 'right:50%', '?'),
-  \   <bang>0)
-
-nmap <Leader>f :Find<cr>
-command! -bang -nargs=* Find
-  \ call fzf#vim#grep(
-  \	  'rg
-  \ --smart-case
-  \ --max-columns=150
-  \ --files
-  \ --colors=line:none
-  \ --colors=line:style:bold
-  \ --no-ignore
+  \ 'rg
+  \ --column
+  \ --glob "*.{py,html}"
   \ --hidden
-  \ --follow
+  \ --ignore-case
   \ --line-number
   \ --no-heading
+  \ --color=always '.shellescape(<q-args>), 1,
+  \   <bang>0 ? fzf#vim#with_preview({'options': '--delimiter : --nth 4..'}, 'up:60%')
+  \           : fzf#vim#with_preview({'options': '--delimiter : --nth 4..'}, 'right:50%:hidden', '?'),
+  \   <bang>0)
+
+nmap <Leader>f :Find <cr>
+command! -bang -nargs=* Find
+  \ call fzf#vim#grep(
+  \	'rg
+  \ --colors=line:none
+  \ --colors=line:style:bold
+  \ --files
   \ --fixed-strings
+  \ --follow
+  \ --hidden
   \ --ignore-case
+  \ --line-number
+  \ --max-columns=150
+  \ --no-ignore
+  \ --no-heading
+  \ --smart-case
   \ --glob "!{.git,node_modules,vendor}/*"
   \ --glob "*.{js,json,php,md,styl,jade,html,config,py,cpp,c,go,hs,rb,conf}"
   \ --glob "/home/jorenza/git/cms/src/*"
@@ -360,6 +376,11 @@ function! NetrwMapping()
     noremap <buffer>q :bd<CR>
 endfunction
 
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Colorizer
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+nmap <leader>c :ColorHighlight<CR>
+
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Ale settings
@@ -379,10 +400,10 @@ let g:ale_fix_on_save = 0
 " Custom Surround setting
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let lf = '<C-v><CR>'
-let vimCommentStart = repeat('"', 90) . lf . '"\ '
-let vimCommentEnd = lf . repeat('"', 90)
-let bashCommentStart = repeat('#', 90) . lf . '\ '
-let bashCommentEnd = lf . repeat('#', 90)
+let vimCommentStart = repeat('"', 70) . lf . '"\ '
+let vimCommentEnd = lf . repeat('"', 70)
+let bashCommentStart = repeat('#', 70) . lf . '\ '
+let bashCommentEnd = lf . repeat('#', 70)
 let ppStart = lf . 'from\ pprint\ import\ pprint' . lf . 'pprint('
 let ppEnd = ')' . lf
 let pdb =  'import\ pdb;\ pdb.set_trace()' . lf
@@ -394,6 +415,12 @@ call customsurround#map('<Leader>vc', vimCommentStart, vimCommentEnd)
 call customsurround#map('<Leader>bc', bashCommentStart, bashCommentEnd)
 call customsurround#map('<Leader>cl', 'console.log({\ ', '\ });')
 call customsurround#map('<Leader>ch', '\%V')
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" css_color
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:cssColorVimDoNotMessMyUpdatetime = 1
+
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Python Syntax Settings

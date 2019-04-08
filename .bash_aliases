@@ -1,7 +1,19 @@
 checkEnv(){
-	if [ ${VIRTUAL_ENV} ]; then
-		deactivate;
-	fi
+    INVENV=$(python -c 'import sys; print ("1" if hasattr(sys, "real_prefix") else "0")');
+    if [ $INVENV = 0 ]; then
+        source $HOME/git/cms/cms2-env/bin/activate;
+    else
+        deactivate && echo "source $HOME/git/cms/cms-env/bin/activate";
+    fi
+}
+
+checkEnv2(){
+    INVENV=$(python -c 'import sys; print ("1" if hasattr(sys, "real_prefix") else "0")');
+    if [ $INVENV = 0 ]; then
+        echo "source $HOME/git/cms/cms2-env/bin/activate";
+    else
+        deactivate && echo "source $HOME/git/cms/cms2-env/bin/activate";
+    fi
 }
 
 # Mongo
@@ -26,17 +38,29 @@ alias cmskill="lsof -i:8000 | grep [p]ython | awk '{print \"kill \"\$2}' | sh"
 alias cmsmake="cmsenv && python manage.py makemigrations --noinput"
 alias cmsmigrate="cmsenv && python manage.py migrate --noinput"
 alias cmspath="cd ~/git/cms/src/247 && pyclean"
-alias cmsint="cd ~/git/cms/src/247/apps247/integration/"
-alias cmsoutbound="cd ~/git/cms/src/247/apps247/integration/feeds/outbound/"
-alias cmsinbound="cd ~/git/cms/src/247/apps247/integration/feeds/inbound/"
+alias cmsint="cmspath && cd apps247/integration/"
+alias cmsoutbound="cmsint && cd feeds/outbound/"
+alias cmsinbound="cmsint && cd feeds/inbound/"
 alias cmsdbupdate="cmsdb && cmsimport"
 alias cmsstatic="cd ~/git/cms/src/247/staticfiles"
 alias cmslessc="cmsstatic && less-watch-compiler cms/less cms/css cms-new-look.less"
 alias cmsrmmigs="cmspath; gitmig | xargs rm"
 alias cmsserver="cmskill; cmsenv && python manage.py runserver --insecure"
 alias cmsshell="cmsenv && python manage.py shell_plus"
-alias cmsupdate="cmspath && git pull && cmsmake && cmsmigrate"
+alias cmsupdate="cmspath && git pull && cmsmake && cmsmigrate && gitrmu"
 alias cmstest="cmsenv && python manage.py"
+
+#CMS2
+alias cms2env="echo $(checkEnv2);"
+alias cms2make="cms2env && python manage.py makemigrations --noinput"
+alias cms2migrate=" cms2env && python manage.py migrate --noinput"
+alias cms2update="cms2path && git pull && cms2make && cms2migrate"
+alias cms2path="cd ~/git/cms/dev/247 && pyclean"
+alias cms2rmmigs="cms2path; gitmig | xargs rm"
+alias cms2int="cms2path && cd apps247/integration/"
+alias cms2outbound="cms2int && cd feeds/outbound/"
+alias cms2inbound="cms2int && cd feeds/inbound/"
+
 
 # Lead Manager
 alias lead-manager="cmspath && cd js_apps/cms/lead_manager/"
@@ -47,7 +71,7 @@ alias lead-manager-less-compile="cmsstatic && cd cms && lessc less/style-2/lead-
 
 # Centerprise
 alias centpath="cd ~/git/centerprise/src/"
-# alias centenv="$(checkEnv) source ~/git/centerprise/cent-env/bin/activate"
+alias centenv="$(checkEnv) source ~/git/centerprise/cent-env/bin/activate"
 alias centsource="source ~/git/centerprise/src/development.sh && docker attach dev-centerprise-cms"
 
 # SecureApplications
@@ -55,6 +79,7 @@ alias venvsec=". ~/git/secureapps/secure-apps-env/bin/activate"
 alias migratesec="python ~/secureapps/manage.py migrate --noinput"
 alias runsec="python ~/secureapps/manage.py runserver 0.0.0.0:8080 --insecure"
 alias celerysec="cd ~/git/secureapps/src/ && celery -A celery_init worker --loglevel=debug"
+
 # Spider
 alias spiderenv=". ~/git/spider/spider-env/bin/activate && spiderpath"
 alias spiderpath="cd ~/git/spider/src/apts247"

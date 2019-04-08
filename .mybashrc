@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # Functions
 function vim() {
   if test $# -gt 0; then
@@ -54,7 +56,7 @@ if [ -f ~/.bash_colors ]; then . ~/.bash_colors ; fi
 if [ -f ~/.bash_paths ]; then . ~/.bash_paths ; fi
 
 # Prompt
-# if [ -f ~/.bash_prompt ]; then . ~/.bash_prompt ; fi
+if [ -f ~/.bash_prompt ]; then . ~/.bash_prompt ; fi
 
 # Git
 if [ -f ~/.git-completion.bash ]; then . ~/.git-completion.bash ; fi
@@ -63,5 +65,4 @@ if [ -f ~/.git-prompt.sh ]; then . ~/.git-prompt.sh ; fi
 if [ -z "$TMUX" ]; then
   tmux new-session -A -s work
 fi
-#
 ######################
