@@ -1,49 +1,65 @@
 ############################# PROMPT #################################
+
+######################################################################
+# Colors
+######################################################################
+white="$(tput setaf 255)"
+pink="$(tput setaf 212)"
+red="$(tput setaf 9)"
+blue="$(tput setaf 39)"
+yellow="$(tput setaf 226)"
+green="$(tput setaf 48)"
+purple="$(tput bold)$(tput setaf 141)"
+indigo="$(tput setaf 69)"
+
+
 ######################################################################
 # Current Time
 ######################################################################
 ct(){
-    CURRENT_TIME=`date +%X`
-    echo -e "$(tput setaf 255)[$(tput setaf 212)${CURRENT_TIME}$(tput setaf 255)] "
+    CTIME="\[\@\]"
+    echo -e "${white}[${pink}${CTIME}${white}] "
 }
 
 ######################################################################
 # Current User
 ######################################################################
 cu() {
-    echo -e "$(tput setaf 9)`whoami`$(tput setaf 255) "
+    CUSER="\[\u\]"
+    echo -e "${red}${CUSER}${white} "
 }
 
 ######################################################################
 # Current Host
 ######################################################################
 ch() {
-    echo -e "at $(tput setaf 33)`hostname`$(tput setaf 255) "
+    CHOST="\[\h\]"
+    echo -e "at ${blue}${CHOST}${white} "
 }
 
 ######################################################################
 # Working directory
 ######################################################################
 wd() {
-    echo -e "in $(tput setaf 226)`pwd | sed 's/\/home\/jorenza/\\~/'`$(tput setaf 255) "
+    CDIR="\[\w\]"
+    echo -e "in ${yellow}${CDIR}${white} "
 }
 
 ######################################################################
 # Virtual Env
 ######################################################################
 ve() {
-    if [ ${VIRTUAL_ENV}  ]; then
-        echo -e "$(tput setaf 255)($(tput setaf 48)`basename ${VIRTUAL_ENV}`$(tput setaf 255)) "
+    if [ ${VIRTUAL_ENV} ]; then
+        echo -e "(${green}$(basename $VIRTUAL_ENV)${white}) "
     fi
 }
 
 ######################################################################
-# Git branch
+# Git prompt
 ######################################################################
-gb(){
-    BRANCH=`__git_ps1 %s`
-	if [ ! "${BRANCH}" == "" ]; then
-        echo -e "on $(tput setaf 135)${BRANCH}$(tput setaf 255) "
+gp(){
+	if [ -d .git ] || git rev-parse --git-dir > /dev/null 2>&1 ; then
+        echo -e "on ${purple}$(__git_ps1 %s)${white} "
 	fi
 }
 
@@ -51,7 +67,12 @@ gb(){
 # Second line
 ######################################################################
 sl(){
-    echo -e "\n\r$(tput setaf 69)➜ $(tput setaf 255)"
+    SYMBOL="\[➜\]"
+    echo -e "\n${indigo}${SYMBOL} ${white} "
 }
 
-export PS1="\`ct\`\`cu\`\`ch\`\`wd\`\`ve\`\`gb\`\`sl\`"
+set_prompt() {
+    PS1="`ct``ve``cu``ch``wd``gp``sl`"
+}
+
+PROMPT_COMMAND=set_prompt
