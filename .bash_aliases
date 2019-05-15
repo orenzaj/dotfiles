@@ -31,6 +31,7 @@ alias stopdockers="docker ps -q | awk '{print \"docker stop \" \$1}' | sh"
 # CMS
 alias cmscelery="cmsenv && celery -A celery_init worker --loglevel=debug"
 alias cmsdb='scp shallowhal:$(ssh shallowhal ls -dt /data/cms*sql* | head -1) /home/jorenza/Downloads/cmsdb/cms.sql.Z'
+alias cmsdup='find . | grep migrations | grep "/[0-9]\+" | grep -v 'pyc' | sed -e "s/\([^/][^/][^/][^/]\)[^/]\+$/\1/" | sort | uniq -c | less'
 alias cmsenv="$(checkEnv) source ~/git/cms/cms-env/bin/activate && cmspath"
 alias cmsinstance="startdockers && centenv && centsource"
 alias cmsimport="stopdockers && dropdb cms && createdb cms && zcat ~/Downloads/cmsdb/cms.sql.Z | psql -f - cms"
@@ -46,8 +47,8 @@ alias cmsstatic="cd ~/git/cms/src/247/staticfiles"
 alias cmslessc="cmsstatic && less-watch-compiler cms/less cms/css cms-new-look.less"
 alias cmsrmmigs="cmspath; gitmig | xargs rm"
 alias cmsserver="cmskill; cmsenv && python manage.py runserver --insecure"
-alias cmsshell="cmsenv && python manage.py shell_plus"
-alias cmsupdate="cmspath && git pull && cmsmake && cmsmigrate && gitrmu"
+alias cmsshell="cmsenv && python manage.py shell_plus --quiet"
+alias cmsupdate="cmspath && git pull && cmsmake && cmsmigrate"
 alias cmstest="cmsenv && python manage.py"
 
 #CMS2
@@ -71,8 +72,9 @@ alias lead-manager-less-compile="cmsstatic && cd cms && lessc less/style-2/lead-
 
 # Centerprise
 alias centpath="cd ~/git/centerprise/src/"
-alias centenv="$(checkEnv) source ~/git/centerprise/cent-env/bin/activate"
-alias centsource="source ~/git/centerprise/src/development.sh && docker attach dev-centerprise-cms"
+alias centenv="source /home/jorenza/.local/share/virtualenvs/centerprise-MGraKJJp/bin/activate && centpath"
+alias centsource="source ~/git/centerprise/src/development.sh && centcms"
+alias centcms="docker attach dev-centerprise-cms"
 
 # SecureApplications
 alias venvsec=". ~/git/secureapps/secure-apps-env/bin/activate"
@@ -137,6 +139,12 @@ alias gitrmd="gitd | awk '{print \"git rm \"\$2}' | sh"
 # Diffs
 alias gitds="git diff --staged"
 alias gitmig="gs | grep 'migrations' | awk '{print \$2}'"
+
+# Branches
+alias gb="git for-each-ref --sort=committerdate refs/heads/ --format='%(committerdate:short) %(refname:short)'"
+
+# Push
+alias gpu="git push -u origin HEAD"
 
 # Trello
 alias trellopath="cd ~/git/trello/src/"

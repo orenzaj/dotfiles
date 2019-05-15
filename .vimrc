@@ -14,6 +14,7 @@ endif
 call plug#begin('~/.vim/plugged')
     Plug 'airblade/vim-gitgutter'
     Plug 'aldantas/vim-custom-surround'
+    Plug 'chrisbra/Colorizer'
     Plug 'dracula/vim', { 'as': 'dracula' }
     Plug 'dyng/ctrlsf.vim'
     Plug 'edkolev/tmuxline.vim'
@@ -26,7 +27,7 @@ call plug#begin('~/.vim/plugged')
     Plug 'simeji/winresizer'
     Plug 'terryma/vim-multiple-cursors'
     Plug 'vim-airline/vim-airline'
-    Plug 'skammer/vim-css-color'
+    Plug 'tmhedberg/matchit'
     Plug 'tpope/vim-commentary'
     Plug 'tpope/vim-fugitive'
     Plug 'tpope/vim-sensible'
@@ -36,17 +37,8 @@ call plug#begin('~/.vim/plugged')
     Plug 'tpope/vim-vinegar'
     Plug 'vim-airline/vim-airline-themes'
     Plug 'Yggdroot/indentLine'
-    " Plug 'vim-scripts/RecentFiles'
     Plug 'w0rp/ale'
 call plug#end()
-
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" RecentFiles
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" set viminfo+=!
-" au BufReadPost * if line("'\"") > 0|if line("'\"") <= line("$")|exe("norm '\"")|else|exe "norm $"|endif|endif|call RecentFilesAdd()
-" nmap <leader>rf :call RecentFilesList()<cr>
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -161,6 +153,11 @@ nmap <leader>x :%!xmllint --format % <CR>
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" json prettyprinter
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+nmap <leader>jj :%!python -m json.tool <CR>
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " CtrlSF settings
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 vmap <Leader>s <Plug>CtrlSFVwordPath <CR>
@@ -192,22 +189,24 @@ map q <Nop>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Tmuxline Settings
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:tmuxline_theme = 'airline'
-let g:tmuxline_preset = 'crosshair'
-let g:tmuxline_preset = {
-            \'a'    : '#S',
-            \'c'    : '#(whoami)',
-            \'win'  : ['#I', '#W'],
-            \'cwin'  : ['#I', '#W'],
-            \'x'    : '#(date)',
-            \'y'    : ['%r', '%a', '%Y'],
-            \'z'    : '#H', }
-let g:tmuxline_separators = {
-            \ 'left' : '',
-            \ 'left_alt': '⮀',
-            \ 'right' : '',
-            \ 'right_alt' : '⮂',
-            \ 'space' : ' '}
+let g:tmuxline_status_justify = 'centre'
+" let g:tmuxline_theme = 'airline'
+" let g:tmuxline_preset = 'crosshair'
+" let g:tmuxline_preset = {
+"             \'a'    : '#S',
+"             \'c'    : '#(whoami)',
+"             \'win'  : ['#I', '#W'],
+"             \'cwin'  : ['#I', '#W'],
+"             \'x'    : '#(date)',
+"             \'y'    : ['%r', '%a', '%Y'],
+"             \'z'    : '#H',
+" }
+" let g:tmuxline_separators = {
+"             \ 'left' : '',
+"             \ 'left_alt': '⮀',
+"             \ 'right' : '',
+"             \ 'right_alt' : '⮂',
+"             \ 'space' : ' '}
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Airline Settings (statusline)
@@ -215,9 +214,10 @@ let g:tmuxline_separators = {
 set laststatus=2
 let g:airline_powerline_fonts = 1
 let g:airline_theme='dracula'
-let g:airline#extensions#tmuxline#enabled = 1
-let airline#extensions#tmuxline#color_template = 'visual'
-let airline#extensions#tmuxline#snapshot_file = "/home/jorenza/.tmuxline.conf"
+let g:airline#extensions#tmuxline#enabled = 0
+let g:airline#extensions#tmuxline#status_justify = "centre"
+" let airline#extensions#tmuxline#color_template = 'visual'
+" let airline#extensions#tmuxline#snapshot_file = "/home/jorenza/.tmuxline.conf"
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -233,6 +233,7 @@ set number
 set relativenumber
 noremap <leader>n :call ToggleNumber()<cr>
 function! ToggleNumber()
+    IndentLinesToggle
 	GitGutterToggle
     set number!
     set relativenumber!
@@ -276,19 +277,6 @@ endif
 " ;f will search for files
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 nmap <Leader>a :Rg <C-R><C-W><CR>
-command! -bang -nargs=* Rg
-  \ call fzf#vim#grep(
-  \ 'rg
-  \ --column
-  \ --hidden
-  \ --ignore-case
-  \ --line-number
-  \ --no-heading
-  \ --color=always '.shellescape(<q-args>), 1,
-  \   <bang>0 ? fzf#vim#with_preview({'options': '--delimiter : --nth 4..'}, 'up:60%')
-  \           : fzf#vim#with_preview({'options': '--delimiter : --nth 4..'}, 'right:50%:hidden', '?'),
-  \   <bang>0)
-
 nmap <Leader>g :Rg <cr>
 command! -bang -nargs=* Rg
   \ call fzf#vim#grep(
@@ -367,6 +355,7 @@ set path+=/home/jorenza/git/cms/src/247/templates_backend
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Vim Vinegar settings
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:netrw_list_hide='.*\.pyc$'
 augroup netrw_keychange
     autocmd!
     autocmd filetype netrw call NetrwMapping()
@@ -415,12 +404,6 @@ call customsurround#map('<Leader>vc', vimCommentStart, vimCommentEnd)
 call customsurround#map('<Leader>bc', bashCommentStart, bashCommentEnd)
 call customsurround#map('<Leader>cl', 'console.log({\ ', '\ });')
 call customsurround#map('<Leader>ch', '\%V')
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" css_color
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:cssColorVimDoNotMessMyUpdatetime = 1
-
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Python Syntax Settings
