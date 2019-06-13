@@ -16,6 +16,24 @@ checkEnv2(){
     fi
 }
 
+cmsroute(){
+    DOMAIN="$1.com";
+    NEW_DOMAIN="$1.localsite.viaryland.com";
+    TEMPLATE_STORAGE="/home/jorenza/git/cms/src/template_storage/designs"
+    DOMAIN_PY="/home/jorenza/git/cms/src/247/test/domain.py"
+
+    LINE1="domain = \"$DOMAIN\"";
+    LINE2="new_domain = \"$NEW_DOMAIN\"";
+
+    rm -rf $TEMPLATE_STORAGE/$NEW_DOMAIN;
+    mkdir $TEMPLATE_STORAGE/$NEW_DOMAIN;
+    sed -i "1s/^.*$/$LINE1/" $DOMAIN_PY;
+    sed -i "2s/^.*$/$LINE2/" $DOMAIN_PY;
+
+    source /home/jorenza/git/cms/cms-env/bin/activate;
+    echo "python /home/jorenza/git/cms/src/247/manage.py shell_plus --quiet << $DOMAIN_PY" | sh;
+}
+
 # Mongo
 alias mongothemelist="mongofiles -h 172.17.0.1 -d apts247_secureapps_themes --prefix=\$(basename \$PWD) --quiet list"
 alias mongothemedir="mongothemelist | awk '{print \"mkdir \"\$1}' | cut -d'/' -sf1 | sort -u | sh"
@@ -24,16 +42,15 @@ alias mongodesignlist="mongofiles -h 172.17.0.1 -d apts247_secureapps_designs --
 alias mongodesigndir="mongodesignlist | awk '{print \"mkdir \"\$2}' | cut -d'/' -sf1 | sort -u | sh"
 alias mongogetalldesigns="mongodesigndir && mongodesignlist | awk '{print \"mongofiles -h 172.17.0.1 -d apts247_secureapps_designs --prefix=\$(basename \$PWD) get \"\$1}' | sh"
 
-# Dockers
-alias startdockers="docker start dev-centerprise-nginx dev-centerprise-sentry dev-centerprise-cms dev-centerprise-cms-login"
-alias stopdockers="docker ps -q | awk '{print \"docker stop \" \$1}' | sh"
-
 # CMS
 alias cmscelery="cmsenv && celery -A celery_init worker --loglevel=debug"
+alias cmspulldb='ssh shallowhal "cd /data && cat \$(ls -S1 cms*.gz|head -n 1)"|gzip -d|psql -U jorenza -h 172.17.0.1 -f - cms'
+alias cmsreimportdb="stopdockers && dropdb cms && createdb cms && cmspulldb"
+alias cmspulldbext='ssh shallowhalext "cd /data && cat \$(ls -S1 cms*.gz|head -n 1)"|gzip -d|psql -U jorenza -h 172.17.0.1 -f - cms'
+alias cmsreimportdbext="stopdockers && dropdb cms && createdb cms && cmspulldbext"
 alias cmsdb='scp shallowhal:$(ssh shallowhal ls -dt /data/cms*sql* | head -1) /home/jorenza/Downloads/cmsdb/cms.sql.Z'
 alias cmsdup='find . | grep migrations | grep "/[0-9]\+" | grep -v 'pyc' | sed -e "s/\([^/][^/][^/][^/]\)[^/]\+$/\1/" | sort | uniq -c | less'
 alias cmsenv="$(checkEnv) source ~/git/cms/cms-env/bin/activate && cmspath"
-alias cmsinstance="startdockers && centenv && centsource"
 alias cmsimport="stopdockers && dropdb cms && createdb cms && zcat ~/Downloads/cmsdb/cms.sql.Z | psql -f - cms"
 alias cmskill="lsof -i:8000 | grep [p]ython | awk '{print \"kill \"\$2}' | sh"
 alias cmsmake="cmsenv && python manage.py makemigrations --noinput"
@@ -70,11 +87,21 @@ alias lead-manager-js-compile="lead-manager && npm run watch"
 alias lead-manager-less-watch-compile="lead-manager-less-compile && less-watch-compiler --config=/home/jorenza/.config/less-watch-compiler.config.json"
 alias lead-manager-less-compile="cmsstatic && cd cms && lessc less/style-2/lead-manager/lead-manager.less css/lead_manager/lead-manager.css && echo 'Initial compile: Complete.'"
 
-# Centerprise
+# Centerprise CMS
 alias centpath="cd ~/git/centerprise/src/"
-alias centenv="source /home/jorenza/.local/share/virtualenvs/centerprise-MGraKJJp/bin/activate && centpath"
-alias centsource="source ~/git/centerprise/src/development.sh && centcms"
-alias centcms="docker attach dev-centerprise-cms"
+alias centenv="source /home/jorenza/git/centerprise/cent-env/bin/activate && centpath"
+alias centenvrestart="deactivate; stopdockers && centenv"
+alias centcmsbuild="centenv && ./build.py --clean cms-login && startcmsdocker"
+alias centcmsrebuild="centenvrestart && ./build.py --use-cache cms-login && startcmsdocker"
+
+alias centcmsstart="centcmsbuild && docker attach dev-centerprise-cms"
+alias centcmsrestart="centenvrestart && startcentdocker && startcmsdocker && docker attach dev-centerprise-cms"
+alias centcmsopen="docker start dev-centerprise-cms && docker attach dev-centerprise-cms"
+
+# Dockers
+alias startcentdocker="docker start dev-centerprise-nginx dev-centerprise-sentry dev-centerprise-cms dev-centerprise-cms-login dev-cms-mailhog dev-cms-redis-server"
+alias startcmsdocker="docker start dev-cms-mailhog dev-cms-redis-server"
+alias stopdockers="\/etc\/init\.d\/docker restart"
 
 # SecureApplications
 alias venvsec=". ~/git/secureapps/secure-apps-env/bin/activate"

@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
 
-# Functions
+######################################################################
+# Main
+######################################################################
+export PATH='/home/jorenza/bin:/home/jorenza/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/usr/local/go/bin:/home/jorenza/go/bin:/home/jorenza/.pyenv/bin'
+
+
+######################################################################
+ # Functions
+######################################################################
 function vim() {
   if test $# -gt 0; then
     env vim "$@"
@@ -41,15 +49,6 @@ function gb {
         echo "`git branch -a|grep -v HEAD|grep remote|sed "s/.*\/origin\///"|sort|awk '{printf("%3d: %s\n", NR, $0)}'`";
     fi
 }
-
-# Disables the extra env variable printing.
-if [[ $(uname -s) == Linux  ]]; then
-    export VIRTUAL_ENV_DISABLE_PROMPT=1
-else
-    unset DYLD_LIBRARY_PATH
-fi
-
-export CPPFLAGS="-P"
 
 ######################################################################
 ## Git
@@ -119,14 +118,10 @@ export GOPATH=$HOME/go
 export GOBIN=$GOPATH/bin
 
 ######################################################################
-# Main
-######################################################################
-export PATH='/home/jorenza/bin:/home/jorenza/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/usr/local/go/bin:/home/jorenza/go/bin:/home/jorenza/.pyenv/bin'
-
-######################################################################
  # Etc
 ######################################################################
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"/usr/local/lib"
+export CPPFLAGS="-P"
 
 #### SOURCE FILES ####
 # Aliases

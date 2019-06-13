@@ -3,46 +3,46 @@
 ######################################################################
 # Colors
 ######################################################################
-white="$(tput setaf 255)"
-pink="$(tput setaf 212)"
-red="$(tput setaf 9)"
-blue="$(tput setaf 39)"
-yellow="$(tput setaf 226)"
-green="$(tput setaf 48)"
-purple="$(tput setaf 141)"
-indigo="$(tput setaf 69)"
+WHITE="\[$(tput setaf 255)\]"
+PINK="\[$(tput setaf 212)\]"
+RED="\[$(tput setaf 9)\]"
+BLUE="\[$(tput setaf 39)\]"
+YELLOW="\[$(tput setaf 226)\]"
+GREEN="\[$(tput setaf 48)\]"
+PURPLE="\[$(tput setaf 141)\]"
+INDIGO="\[$(tput setaf 69)\]"
 
 
 ######################################################################
 # Current Time
 ######################################################################
 ct(){
-    CTIME="\[\@\]"
-    echo -e "${white}[${pink}${CTIME}${white}] "
+    CTIME="\@"
+    echo -e "${WHITE}[${PINK}${CTIME}${WHITE}] "
 }
 
 ######################################################################
 # Current User
 ######################################################################
 cu() {
-    CUSER="\[\u\]"
-    echo -e "${red}${CUSER}${white} "
+    CUSER="\u"
+    echo -e "${RED}${CUSER}${WHITE} "
 }
 
 ######################################################################
 # Current Host
 ######################################################################
 ch() {
-    CHOST="\[\h\]"
-    echo -e "at ${blue}${CHOST}${white} "
+    CHOST="\h"
+    echo -e "at ${BLUE}${CHOST}${WHITE} "
 }
 
 ######################################################################
 # Working directory
 ######################################################################
 wd() {
-    CDIR="\[\w\]"
-    echo -e "in ${yellow}${CDIR}${white} "
+    CDIR="\w"
+    echo -e "in ${YELLOW}${CDIR}${WHITE} "
 }
 
 ######################################################################
@@ -50,7 +50,7 @@ wd() {
 ######################################################################
 ve() {
     if [ ${VIRTUAL_ENV} ]; then
-        echo -e "(${green}$(basename $VIRTUAL_ENV)${white}) "
+        echo -e "(${GREEN}$(basename $VIRTUAL_ENV)${WHITE}) "
     fi
 }
 
@@ -59,7 +59,7 @@ ve() {
 ######################################################################
 gp(){
 	if [ -d .git ] || git rev-parse --git-dir > /dev/null 2>&1 ; then
-        echo -e "on ${purple}$(__git_ps1 %s)${white} "
+        echo -e "on ${PURPLE}$(__git_ps1 %s)${WHITE} "
 	fi
 }
 
@@ -67,8 +67,8 @@ gp(){
 # Second line
 ######################################################################
 sl(){
-    SYMBOL="\[➜\]"
-    echo -e "\r\n${indigo}${SYMBOL} ${white} "
+    SYMBOL="➜"
+    echo -e "\r\n${INDIGO}${SYMBOL} ${WHITE} "
 }
 
 set_prompt() {
@@ -76,3 +76,12 @@ set_prompt() {
 }
 
 PROMPT_COMMAND=set_prompt
+
+######################################################################
+# # Disables the extra env variable on prompt.
+# ######################################################################
+if [[ $(uname -s) == Linux ]]; then
+    export VIRTUAL_ENV_DISABLE_PROMPT=1
+else
+    unset DYLD_LIBRARY_PATH
+fi
