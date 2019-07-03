@@ -45,7 +45,7 @@ alias mongogetalldesigns="mongodesigndir && mongodesignlist | awk '{print \"mong
 # CMS
 alias cmscelery="cmsenv && celery -A celery_init worker --loglevel=debug"
 alias cmspulldb='ssh shallowhal "cd /data && cat \$(ls -S1 cms*.gz|head -n 1)"|gzip -d|psql -U jorenza -h 172.17.0.1 -f - cms'
-alias cmsreimportdb="stopdockers && dropdb cms && createdb cms && cmspulldb"
+alias cmsreimportdb="stopdockers && dropdb cms && createdb cms && cmspulldb && cmsupdate"
 alias cmspulldbext='ssh shallowhalext "cd /data && cat \$(ls -S1 cms*.gz|head -n 1)"|gzip -d|psql -U jorenza -h 172.17.0.1 -f - cms'
 alias cmsreimportdbext="stopdockers && dropdb cms && createdb cms && cmspulldbext"
 alias cmsdb='scp shallowhal:$(ssh shallowhal ls -dt /data/cms*sql* | head -1) /home/jorenza/Downloads/cmsdb/cms.sql.Z'

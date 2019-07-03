@@ -66,6 +66,7 @@ export FZF_DEFAULT_COMMAND='rg
     \ --color "always" "!.git/*"
     \ --fixed-strings
     \ --follow
+    \ --glob "*.{py,html}"
     \ --glob "!{.git,node_modules,.min.js}/*"
     \ --glob "/home/jorenza/git/cms/src/*"
     \ --hidden
@@ -76,7 +77,6 @@ export FZF_DEFAULT_COMMAND='rg
     \ --no-ignore
     \ --smart-case '
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-source ~/.fzf.bash
 # if [ -f ~/.fzf.bash  ]; then source ~/.fzf.bash; fi
 
 bind -x '"\C-p": vim $(fzf);'
@@ -89,15 +89,20 @@ export RIPGREP_CONFIG_PATH=$HOME/.ripgreprc rg foo
 ######################################################################
 # NVM
 ######################################################################
-# export NVM_DIR="$HOME/.nvm"
-# [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-# [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 ######################################################################
 # LANG
 ######################################################################
 export LANG=en_US.UTF-8
 export LC_CTYPE=en_US.UTF-8
+
+######################################################################
+# DISPLAY
+######################################################################
+export DISPLAY=:0
 
 ######################################################################
 # PYENV
@@ -137,7 +142,7 @@ if [ -f ~/.bash_prompt ]; then . ~/.bash_prompt ; fi
 if [ -f ~/.git-completion.bash ]; then . ~/.git-completion.bash ; fi
 if [ -f ~/.git-prompt.sh ]; then . ~/.git-prompt.sh ; fi
 
-# if [ -z "$TMUX" ]; then
-#   tmux new-session -A -s work
-# fi
+if [ -z "$TMUX" ]; then
+  tmux new-session -A -s work
+fi
 ######################

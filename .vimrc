@@ -16,6 +16,7 @@ call plug#begin('~/.vim/plugged')
     Plug 'aldantas/vim-custom-surround'
     Plug 'chrisbra/Colorizer'
     Plug 'dracula/vim', { 'as': 'dracula' }
+    Plug 'flrnprz/candid.vim'
     Plug 'dyng/ctrlsf.vim'
     Plug 'edkolev/tmuxline.vim'
     Plug 'jiangmiao/auto-pairs'
@@ -89,8 +90,8 @@ if !has('gui_running')
     set termguicolors
     set t_Co=256
 endif
-colorscheme dracula
-let g:dracula_italic = 0
+colorscheme candid
+" let g:dracula_italic = 0
 highlight Normal ctermbg=None
 
 
@@ -249,9 +250,10 @@ nnoremap <space> za
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Pasting
+" Copying Pasting
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 nmap <leader>v :setlocal paste!<cr>"
+set clipboard+=unnamedplus
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -283,6 +285,8 @@ command! -bang -nargs=* Rg
   \ 'rg
   \ --column
   \ --glob "*.{py,html}"
+  \ --glob "/home/jorenza/git/cms/src/**"
+  \ --glob "!{.git,node_modules,.min.js}/*"
   \ --hidden
   \ --ignore-case
   \ --line-number
@@ -350,6 +354,7 @@ endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set path+=/home/jorenza/git/cms/src/247/apps247
 set path+=/home/jorenza/git/cms/src/247/templates_backend
+set path+=/home/jorenza/git/cms/src/247/staticfiles
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
