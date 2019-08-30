@@ -1,18 +1,8 @@
-checkEnv(){
+function cmsenv () {
     INVENV=$(python -c 'import sys; print ("1" if hasattr(sys, "real_prefix") else "0")');
     if [ $INVENV = 0 ]; then
-        source $HOME/git/cms/cms2-env/bin/activate;
-    else
-        deactivate && echo "source $HOME/git/cms/cms-env/bin/activate";
-    fi
-}
-
-checkEnv2(){
-    INVENV=$(python -c 'import sys; print ("1" if hasattr(sys, "real_prefix") else "0")');
-    if [ $INVENV = 0 ]; then
-        echo "source $HOME/git/cms/cms2-env/bin/activate";
-    else
-        deactivate && echo "source $HOME/git/cms/cms2-env/bin/activate";
+        source ~/git/cms/cms-env/bin/activate;
+        cmspath;
     fi
 }
 
@@ -50,7 +40,6 @@ alias cmspulldbext='ssh shallowhalext "cd /data && cat \$(ls -S1 cms*.gz|head -n
 alias cmsreimportdbext="stopdockers && dropdb cms && createdb cms && cmspulldbext"
 alias cmsdb='scp shallowhal:$(ssh shallowhal ls -dt /data/cms*sql* | head -1) /home/jorenza/Downloads/cmsdb/cms.sql.Z'
 alias cmsdup='find . | grep migrations | grep "/[0-9]\+" | grep -v 'pyc' | sed -e "s/\([^/][^/][^/][^/]\)[^/]\+$/\1/" | sort | uniq -c | less'
-alias cmsenv="$(checkEnv) source ~/git/cms/cms-env/bin/activate && cmspath"
 alias cmsimport="stopdockers && dropdb cms && createdb cms && zcat ~/Downloads/cmsdb/cms.sql.Z | psql -f - cms"
 alias cmskill="lsof -i:8000 | grep [p]ython | awk '{print \"kill \"\$2}' | sh"
 alias cmsmake="cmsenv && python manage.py makemigrations --noinput"
@@ -69,7 +58,6 @@ alias cmsupdate="cmspath && git pull && cmsmake && cmsmigrate"
 alias cmstest="cmsenv && python manage.py"
 
 #CMS2
-alias cms2env="echo $(checkEnv2);"
 alias cms2make="cms2env && python manage.py makemigrations --noinput"
 alias cms2migrate=" cms2env && python manage.py migrate --noinput"
 alias cms2update="cms2path && git pull && cms2make && cms2migrate"

@@ -2,8 +2,13 @@
 " Vim Plug auto installer
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 if empty(glob('~/.vim/autoload/plug.vim'))
-    silent curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
-        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    silent !curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs
+        \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    autocmd VimEnter * PlugInstall
+endif
+if empty(glob('~/.config/nvim/autoload/plug.vim'))
+    silent !curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs
+        \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
     autocmd VimEnter * PlugInstall
 endif
 
@@ -25,9 +30,9 @@ call plug#begin('~/.vim/plugged')
     Plug 'junegunn/fzf.vim'
     Plug 'roxma/vim-tmux-clipboard'
     Plug 'sheerun/vim-polyglot'
+    Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
     Plug 'simeji/winresizer'
     Plug 'terryma/vim-multiple-cursors'
-    Plug 'vim-airline/vim-airline'
     Plug 'tmhedberg/matchit'
     Plug 'tpope/vim-commentary'
     Plug 'tpope/vim-fugitive'
@@ -36,6 +41,7 @@ call plug#begin('~/.vim/plugged')
     Plug 'tpope/vim-obsession'
     Plug 'tpope/vim-repeat'
     Plug 'tpope/vim-vinegar'
+    Plug 'vim-airline/vim-airline'
     Plug 'vim-airline/vim-airline-themes'
     Plug 'Yggdroot/indentLine'
     Plug 'w0rp/ale'
@@ -49,6 +55,7 @@ set nocompatible
 set noshowmode
 set noswapfile
 set encoding=utf-8
+filetype plugin on
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -376,6 +383,12 @@ endfunction
 nmap <leader>c :ColorHighlight<CR>
 
 
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Deoplete settings
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:deoplete#enable_at_startup = 1
+
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Ale settings
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -403,7 +416,7 @@ let g:ale_fix_on_save = 0
 let lf = '<C-v><CR>'
 let vimCommentStart = repeat('"', 70) . lf . '"\ '
 let vimCommentEnd = lf . repeat('"', 70)
-let bashCommentStart = repeat('#', 70) . lf . '\ '
+let bashCommentStart = repeat('#', 70) . lf . '#\ '
 let bashCommentEnd = lf . repeat('#', 70)
 let ppStart = lf . 'from\ pprint\ import\ pprint' . lf . 'pprint('
 let ppEnd = ')' . lf
