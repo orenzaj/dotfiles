@@ -2,14 +2,14 @@
 " Vim Plug auto installer
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 if empty(glob('~/.vim/autoload/plug.vim'))
-    silent !curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs
-        \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-    autocmd VimEnter * PlugInstall
+    silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+                \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 if empty(glob('~/.config/nvim/autoload/plug.vim'))
     silent !curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs
-        \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-    autocmd VimEnter * PlugInstall
+                \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
 
@@ -17,6 +17,7 @@ endif
 " VimPlug Settings
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 call plug#begin('~/.vim/plugged')
+    Plug 'airblade/vim-rooter'
     Plug 'airblade/vim-gitgutter'
     Plug 'aldantas/vim-custom-surround'
     Plug 'chrisbra/Colorizer'
@@ -279,31 +280,35 @@ if executable('rg')
 endif
 
 
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Rooter settings
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:rooter_use_lcd = 1
+let g:rooter_manual_only = 1
+set autochdir
+
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " fzf settings
 " ;a will search for the word under the cursor
 " ;g will search for words
 " ;f will search for files
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-nmap <Leader>a :Rg <C-R><C-W><CR>
-nmap <Leader>g :Rg <cr>
 command! -bang -nargs=* Rg
   \ call fzf#vim#grep(
   \ 'rg
   \ --column
   \ --glob "*.{py,html}"
-  \ --glob "/home/jorenza/git/cms/src/**"
   \ --glob "!{.git,node_modules,.min.js}/*"
   \ --hidden
-  \ --ignore-case
+  \ --smart-case
   \ --line-number
   \ --no-heading
   \ --color=always '.shellescape(<q-args>), 1,
-  \   <bang>0 ? fzf#vim#with_preview({'options': '--delimiter : --nth 4..'}, 'up:60%')
-  \           : fzf#vim#with_preview({'options': '--delimiter : --nth 4..'}, 'right:50%:hidden', '?'),
+  \   <bang>0 ? fzf#vim#with_preview({'options': '--delimiter : --nth 4..', 'dir': FindRootDirectory()}, 'up:60%')
+  \           : fzf#vim#with_preview({'options': '--delimiter : --nth 4..', 'dir': FindRootDirectory()}, 'right:50%:hidden', '?'),
   \   <bang>0)
 
-nmap <Leader>f :Find <cr>
 command! -bang -nargs=* Find
   \ call fzf#vim#grep(
   \	'rg
@@ -322,8 +327,10 @@ command! -bang -nargs=* Find
   \ --glob "!{.git,node_modules,vendor}/*"
   \ --glob "*.{js,json,php,md,styl,jade,html,config,py,cpp,c,go,hs,rb,conf}"
   \ --glob "/home/jorenza/git/cms/src/*"
-  \ --color "always"'.shellescape(<q-args>).'| tr -d "\017"', 1, <bang>0)
+  \ --color "always"'.shellescape(<q-args>).'| tr -d "\017"', 1, {"dir": FindRootDirectory()})
 
+nmap <Leader>a :Rg <C-R><C-W><CR>
+nmap <Leader>g :Rg <cr>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Brian Shenanigans (gf, paths)

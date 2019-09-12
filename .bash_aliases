@@ -1,13 +1,17 @@
-function cmsenv () {
+cmsenv() {
     INVENV=$(python -c 'import sys; print ("1" if hasattr(sys, "real_prefix") else "0")');
     if [ $INVENV = 0 ]; then
-        source ~/git/cms/cms-env/bin/activate;
-        cmspath;
+        source /home/jorenza/git/cms/cms-env/bin/activate;
+        cd /home/jorenza/git/cms/src/247;
     fi
 }
 
-cmsroute(){
-    DOMAIN="$1.com";
+cmslocalsite(){
+    DOMAIN="$1";
+    if [[ $DOMAIN != *".com"* ]]; then
+        DOMAIN="$1.com";
+    fi
+
     NEW_DOMAIN="$1.localsite.viaryland.com";
     TEMPLATE_STORAGE="/home/jorenza/git/cms/src/template_storage/designs"
     DOMAIN_PY="/home/jorenza/git/cms/src/247/test/domain.py"
@@ -21,7 +25,7 @@ cmsroute(){
     sed -i "2s/^.*$/$LINE2/" $DOMAIN_PY;
 
     source /home/jorenza/git/cms/cms-env/bin/activate;
-    echo "python /home/jorenza/git/cms/src/247/manage.py shell_plus --quiet << $DOMAIN_PY" | sh;
+    echo "python /home/jorenza/git/cms/src/247/manage.py shell_plus --quiet < $DOMAIN_PY" | sh;
 }
 
 # Mongo
@@ -157,9 +161,13 @@ alias gitmig="gs | grep 'migrations' | awk '{print \$2}'"
 
 # Branches
 alias gb="git for-each-ref --sort=committerdate refs/heads/ --format='%(committerdate:short) %(refname:short)'"
+alias gcm="git checkout master"
 
 # Push
 alias gpu="git push -u origin HEAD"
+
+# Stash
+alias gsl="git stash list"
 
 # Trello
 alias trellopath="cd ~/git/trello/src/"
