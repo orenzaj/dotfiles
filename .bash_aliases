@@ -1,32 +1,47 @@
-cmsenv() {
+function centenv() {
     INVENV=$(python -c 'import sys; print ("1" if hasattr(sys, "real_prefix") else "0")');
     if [ $INVENV = 0 ]; then
-        source /home/jorenza/git/cms/cms-env/bin/activate;
-        cd /home/jorenza/git/cms/src/247;
+        eval centactivate;
+    else
+        eval centpath;
     fi
-}
+};
 
-cmslocalsite(){
+function cmsenv() {
+    INVENV=$(python -c 'import sys; print ("1" if hasattr(sys, "real_prefix") else "0")');
+    if [ $INVENV = 0 ]; then
+        eval cmsactivate;
+    else
+        eval cmspath;
+    fi
+};
+
+function cmslocalsite(){
     DOMAIN="$1";
-    if [[ $DOMAIN != *".com"* ]]; then
+    if [ $DOMAIN != *".com"* ]; then
         DOMAIN="$1.com";
     fi
 
+    # Set up directories
     NEW_DOMAIN="$1.localsite.viaryland.com";
     TEMPLATE_STORAGE="/home/jorenza/git/cms/src/template_storage/designs"
-    DOMAIN_PY="/home/jorenza/git/cms/src/247/test/domain.py"
+    rm -rf $TEMPLATE_STORAGE/$NEW_DOMAIN;
+    mkdir $TEMPLATE_STORAGE/$NEW_DOMAIN;
 
+    # The first two lines of python code the file to replace.
     LINE1="domain = \"$DOMAIN\"";
     LINE2="new_domain = \"$NEW_DOMAIN\"";
 
-    rm -rf $TEMPLATE_STORAGE/$NEW_DOMAIN;
-    mkdir $TEMPLATE_STORAGE/$NEW_DOMAIN;
+
+    # Modify django shell script
+    DOMAIN_PY="/home/jorenza/git/cms/src/247/test/domain.py"
     sed -i "1s/^.*$/$LINE1/" $DOMAIN_PY;
     sed -i "2s/^.*$/$LINE2/" $DOMAIN_PY;
 
-    source /home/jorenza/git/cms/cms-env/bin/activate;
+    # Run django shell script
+    eval cmsenv;
     echo "python /home/jorenza/git/cms/src/247/manage.py shell_plus --quiet < $DOMAIN_PY" | sh;
-}
+};
 
 # Mongo
 alias mongothemelist="mongofiles -h 172.17.0.1 -d apts247_secureapps_themes --prefix=\$(basename \$PWD) --quiet list"
@@ -37,6 +52,7 @@ alias mongodesigndir="mongodesignlist | awk '{print \"mkdir \"\$2}' | cut -d'/' 
 alias mongogetalldesigns="mongodesigndir && mongodesignlist | awk '{print \"mongofiles -h 172.17.0.1 -d apts247_secureapps_designs --prefix=\$(basename \$PWD) get \"\$1}' | sh"
 
 # CMS
+alias cmsactivate="source ~/git/cms/cms-env/bin/activate && cmspath"
 alias cmscelery="cmsenv && celery -A celery_init worker --loglevel=debug"
 alias cmspulldb='ssh shallowhal "cd /data && cat \$(ls -S1 cms*.gz|head -n 1)"|gzip -d|psql -U jorenza -h 172.17.0.1 -f - cms'
 alias cmsreimportdb="stopdockers && dropdb cms && createdb cms && cmspulldb && cmsupdate"
@@ -81,7 +97,7 @@ alias lead-manager-less-compile="cmsstatic && cd cms && lessc less/style-2/lead-
 
 # Centerprise CMS
 alias centpath="cd ~/git/centerprise/src/"
-alias centenv="source /home/jorenza/git/centerprise/cent-env/bin/activate && centpath"
+alias centactivate="source /home/jorenza/git/centerprise/cent-env/bin/activate && centpath"
 alias centenvrestart="deactivate; stopdockers && centenv"
 alias centcmsbuild="centenv && ./build.py --clean cms-login && startcmsdocker"
 alias centcmsrebuild="centenvrestart && ./build.py --use-cache cms-login && startcmsdocker"
@@ -118,9 +134,7 @@ if [[ $(uname -s) == Linux  ]]; then
 else
     alias ls='gls --group-directories-first --color=auto'
 fi
-if [ -x "$(which nvim)"  ]; then
-    alias vim='nvim'
-fi
+
 alias pyclean='find . -type f -name "*.py[co]" -exec rm -f \{\} \;'
 alias speedtest="curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python -"
 alias whatsmyip="dig +short myip.opendns.com @resolver1.opendns.com"
@@ -148,6 +162,7 @@ alias gitm="gs | grep ' M '"
 alias gitam="gitm | awk '{print \"git add \"\$2}' | sh"
 alias gitcom="gitm | awk '{print \"git checkout \"\$2}' | sh"
 alias gitrmm="gitm | awk '{print \"rm \"\$2}' | sh"
+alias gitsm="gs | grep 'M ' | awk '{print \"git reset HEAD \"\$2}' | sh"
 
 # All
 alias gitaa="gs | grep -v \# | awk '{print \"git add \"\$2}' | sh"
@@ -162,12 +177,16 @@ alias gitmig="gs | grep 'migrations' | awk '{print \$2}'"
 # Branches
 alias gb="git for-each-ref --sort=committerdate refs/heads/ --format='%(committerdate:short) %(refname:short)'"
 alias gcm="git checkout master"
+alias gcb="git checkout -b"
 
 # Push
 alias gpu="git push -u origin HEAD"
+alias gpb='f(){ gcb && gitam && git commit {"$@"} && gpu; unset -f f; }; f'
 
 # Stash
 alias gsl="git stash list"
+alias gss="git stash save"
+alias gsa='f(){ git stash apply stash@{"$@"};  unset -f f; }; f'
 
 # Trello
 alias trellopath="cd ~/git/trello/src/"

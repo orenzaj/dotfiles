@@ -6,32 +6,29 @@ if empty(glob('~/.vim/autoload/plug.vim'))
                 \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
     autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
-if empty(glob('~/.config/nvim/autoload/plug.vim'))
-    silent !curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs
-                \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-    autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
-endif
-
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " VimPlug Settings
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-call plug#begin('~/.vim/plugged')
+call plug#begin('~/.local/share/nvim/plugged')
     Plug 'airblade/vim-rooter'
     Plug 'airblade/vim-gitgutter'
     Plug 'aldantas/vim-custom-surround'
     Plug 'chrisbra/Colorizer'
+    Plug 'dense-analysis/ale'
     Plug 'dracula/vim', { 'as': 'dracula' }
-    Plug 'flrnprz/candid.vim'
     Plug 'dyng/ctrlsf.vim'
     Plug 'edkolev/tmuxline.vim'
+    Plug 'flrnd/candid.vim'
     Plug 'jiangmiao/auto-pairs'
     Plug 'jlanzarotta/bufexplorer'
     Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
     Plug 'junegunn/fzf.vim'
     Plug 'roxma/vim-tmux-clipboard'
+    Plug 'roxma/nvim-yarp'
+    Plug 'roxma/vim-hug-neovim-rpc'
     Plug 'sheerun/vim-polyglot'
-    Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+    Plug 'Shougo/deoplete.nvim'
     Plug 'simeji/winresizer'
     Plug 'terryma/vim-multiple-cursors'
     Plug 'tmhedberg/matchit'
@@ -45,13 +42,13 @@ call plug#begin('~/.vim/plugged')
     Plug 'vim-airline/vim-airline'
     Plug 'vim-airline/vim-airline-themes'
     Plug 'Yggdroot/indentLine'
-    Plug 'w0rp/ale'
 call plug#end()
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Misc
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" set nohidden
 set nocompatible
 set noshowmode
 set noswapfile
@@ -148,18 +145,15 @@ cnoremap <C-A> <Home>
 cnoremap <C-E> <End>
 cnoremap <C-K> <C-U>
 
-
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Delete trailing white space
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 autocmd BufWritePre * :%s/\s\+$//e
 
-
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " xmllint
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 nmap <leader>x :%!xmllint --format % <CR>
-
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " json prettyprinter
@@ -167,22 +161,24 @@ nmap <leader>x :%!xmllint --format % <CR>
 nmap <leader>jj :%!python -m json.tool <CR>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Run python file
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+nmap <leader>r :!python %:p <CR>
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " CtrlSF settings
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 vmap <Leader>s <Plug>CtrlSFVwordPath <CR>
-
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Hide search highlights, location list, quickfix list
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 noremap <silent> <leader><esc> :noh <bar> lcl <bar> ccl<cr>
 
-
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "  Switch CWD to path of open buffer
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 map <leader>cd :cd %:p:h<cr>:pwd<cr>
-
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Split Lines
@@ -193,7 +189,6 @@ nnoremap K i<CR><Esc>
 " Remove Recording
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 map q <Nop>
-
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Tmuxline Settings
@@ -269,7 +264,6 @@ set clipboard+=unnamedplus
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 command! W w !sudo tee % > /dev/null
 nnoremap <leader>w :w!<cr>
-
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " RipGrep settings
@@ -389,12 +383,11 @@ endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 nmap <leader>c :ColorHighlight<CR>
 
-
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Deoplete settings
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let g:deoplete#enable_at_startup = 1
-
+call deoplete#custom#option('sources', {'_': ['ale', ]})
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Ale settings
@@ -403,19 +396,24 @@ let g:airline#extensions#ale#enabled = 1
 
 " Linters
 let g:ale_linters = {
-    \'javascript': ['prettier', 'eslint'],
-    \'python': ['flake8', 'autopep8', 'isort']
+            \'python': ['flake8', 'autopep8', 'isort']
 \}
-let g:ale_lint_on_save = 1
-let g:ale_lint_on_text_changed = 'never'
+" let g:ale_lint_on_text_changed = 'never'
+let g:ale_lint_on_text_changed = 0
+let g:ale_lint_on_insert_leave = 0
 let g:ale_lint_on_enter = 0
+let g:ale_lint_on_save = 1
 
 " Fixers
 let g:ale_fixers = {
-    \'javascript': ['prettier', 'eslint'],
-    \'python': ['flake8', 'autopep8', 'isort']
+            \'javascript': ['prettier', 'eslint'],
+            \'python': ['flake8', 'autopep8', 'isort']
 \}
 let g:ale_fix_on_save = 0
+
+" Completion
+let g:ale_completion_enabled = 1
+set omnifunc=ale#completion#OmniFunc
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Custom Surround setting

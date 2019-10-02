@@ -143,6 +143,6 @@ if [ -f ~/.git-completion.bash ]; then . ~/.git-completion.bash ; fi
 if [ -f ~/.git-prompt.sh ]; then . ~/.git-prompt.sh ; fi
 
 if [ -z "$TMUX" ]; then
-  tmux new-session -A -s work
+  tmux new-session -A -s parallels
 fi
 ######################
