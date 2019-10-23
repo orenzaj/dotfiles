@@ -1,7 +1,8 @@
-function centenv() {
-    INVENV=$(python -c 'import sys; print ("1" if hasattr(sys, "real_prefix") else "0")');
+function centenv() { INVENV=$(python -c 'import sys; print ("1" if hasattr(
+    sys, "real_prefix") else "0")');
     if [ $INVENV = 0 ]; then
         eval centactivate;
+        clear;
     else
         eval centpath;
     fi
@@ -11,32 +12,36 @@ function cmsenv() {
     INVENV=$(python -c 'import sys; print ("1" if hasattr(sys, "real_prefix") else "0")');
     if [ $INVENV = 0 ]; then
         eval cmsactivate;
+        clear;
     else
         eval cmspath;
     fi
 };
 
 function cmslocalsite(){
-    DOMAIN="$1";
+    COMMID="$1";
+    DOMAIN="$2";
     if [ $DOMAIN != *".com"* ]; then
-        DOMAIN="$1.com";
+        DOMAIN="$2.com";
     fi
 
     # Set up directories
     NEW_DOMAIN="$1.localsite.viaryland.com";
     TEMPLATE_STORAGE="/home/jorenza/git/cms/src/template_storage/designs"
+    COMM_QUERY="Community.objects.get(id=$COMMID)";
     rm -rf $TEMPLATE_STORAGE/$NEW_DOMAIN;
     mkdir $TEMPLATE_STORAGE/$NEW_DOMAIN;
 
     # The first two lines of python code the file to replace.
-    LINE1="domain = \"$DOMAIN\"";
-    LINE2="new_domain = \"$NEW_DOMAIN\"";
-
+    LINE1="community = \"$COMM_QUERY\"";
+    # LINE2="domain = \"$DOMAIN\"";
+    # LINE3="new_domain = \"$NEW_DOMAIN\"";
 
     # Modify django shell script
     DOMAIN_PY="/home/jorenza/git/cms/src/247/test/domain.py"
     sed -i "1s/^.*$/$LINE1/" $DOMAIN_PY;
     sed -i "2s/^.*$/$LINE2/" $DOMAIN_PY;
+    sed -i "3s/^.*$/$LINE3/" $DOMAIN_PY;
 
     # Run django shell script
     eval cmsenv;
@@ -54,11 +59,12 @@ alias mongogetalldesigns="mongodesigndir && mongodesignlist | awk '{print \"mong
 # CMS
 alias cmsactivate="source ~/git/cms/cms-env/bin/activate && cmspath"
 alias cmscelery="cmsenv && celery -A celery_init worker --loglevel=debug"
-alias cmspulldb='ssh shallowhal "cd /data && cat \$(ls -S1 cms*.gz|head -n 1)"|gzip -d|psql -U jorenza -h 172.17.0.1 -f - cms'
+alias cmspulldb='ssh shallowhal "cd /data/db && cat \$(ls -S1 cms*.gz|head -n 1)"|gzip -d|psql -U jorenza -h 172.17.0.1 -f - cms'
 alias cmsreimportdb="stopdockers && dropdb cms && createdb cms && cmspulldb && cmsupdate"
-alias cmspulldbext='ssh shallowhalext "cd /data && cat \$(ls -S1 cms*.gz|head -n 1)"|gzip -d|psql -U jorenza -h 172.17.0.1 -f - cms'
+alias cmspulldbtomservo='ssh tomservo "cd /data/db && cat \$(ls -S1 cms*.gz|head -n 1)"|gzip -d|psql -U jorenza -h 172.17.0.1 -f - cms'
+alias cmspulldbext='ssh shallowhalext "cd /data/db && cat \$(ls -S1 cms*.gz|head -n 1)"|gzip -d|psql -U jorenza -h 172.17.0.1 -f - cms'
 alias cmsreimportdbext="stopdockers && dropdb cms && createdb cms && cmspulldbext"
-alias cmsdb='scp shallowhal:$(ssh shallowhal ls -dt /data/cms*sql* | head -1) /home/jorenza/Downloads/cmsdb/cms.sql.Z'
+alias cmsdb='scp shallowhal:$(ssh shallowhal ls -dt /data/db/cms*sql* | head -1) /home/jorenza/Downloads/cmsdb/cms.sql.Z'
 alias cmsdup='find . | grep migrations | grep "/[0-9]\+" | grep -v 'pyc' | sed -e "s/\([^/][^/][^/][^/]\)[^/]\+$/\1/" | sort | uniq -c | less'
 alias cmsimport="stopdockers && dropdb cms && createdb cms && zcat ~/Downloads/cmsdb/cms.sql.Z | psql -f - cms"
 alias cmskill="lsof -i:8000 | grep [p]ython | awk '{print \"kill \"\$2}' | sh"
@@ -76,6 +82,8 @@ alias cmsserver="cmskill; cmsenv && python manage.py runserver --insecure"
 alias cmsshell="cmsenv && python manage.py shell_plus --quiet"
 alias cmsupdate="cmspath && git pull && cmsmake && cmsmigrate"
 alias cmstest="cmsenv && python manage.py"
+alias cmslocalpy="cmspath && vim settings/local.py"
+alias cmsmongo="mongod --bind_ip 172.17.0.1"
 
 #CMS2
 alias cms2make="cms2env && python manage.py makemigrations --noinput"
@@ -191,3 +199,25 @@ alias gsa='f(){ git stash apply stash@{"$@"};  unset -f f; }; f'
 # Trello
 alias trellopath="cd ~/git/trello/src/"
 alias trelloenv="trellopath && source ../trello-env/bin/activate"
+
+# Sites
+function sitesenv(){
+    if [ -z $PYENV_VERSION ]; then
+        eval sitesactivate;
+    else
+        eval sitespath;
+    fi
+    clear;
+}
+function sitesupdate(){
+    APPNAME="$1";
+    eval sitesmake $APPNAME;
+    eval sitesmigrate $APPNAME;
+}
+alias sitespath="cd ~/git/Django-Projects/src/sites"
+alias sitesactivate="pyenv activate sites-env && sitespath"
+alias sitesserver="sitesenv && python manage.py runserver 8081"
+alias sitesmigrate="sitesenv && python manage.py migrate"
+alias sitesmake="sitesenv && python manage.py makemigrations"
+alias siteskill="lsof -i:8080 | grep [p]ython | awk '{print \"kill \"\$2}' | sh"
+alias sitesshell="sitesenv && python manage.py shell_plus"

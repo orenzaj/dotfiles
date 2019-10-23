@@ -9,8 +9,8 @@ endif
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " VimPlug Settings
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-call plug#begin('~/.local/share/nvim/plugged')
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+call plug#begin('~/.vim/plugged')
     Plug 'airblade/vim-rooter'
     Plug 'airblade/vim-gitgutter'
     Plug 'aldantas/vim-custom-surround'
@@ -21,14 +21,15 @@ call plug#begin('~/.local/share/nvim/plugged')
     Plug 'edkolev/tmuxline.vim'
     Plug 'flrnd/candid.vim'
     Plug 'jiangmiao/auto-pairs'
-    Plug 'jlanzarotta/bufexplorer'
     Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
     Plug 'junegunn/fzf.vim'
+    Plug 'mattn/emmet-vim'
     Plug 'roxma/vim-tmux-clipboard'
     Plug 'roxma/nvim-yarp'
     Plug 'roxma/vim-hug-neovim-rpc'
     Plug 'sheerun/vim-polyglot'
     Plug 'Shougo/deoplete.nvim'
+    Plug 'Shougo/unite.vim'
     Plug 'simeji/winresizer'
     Plug 'terryma/vim-multiple-cursors'
     Plug 'tmhedberg/matchit'
@@ -96,7 +97,6 @@ if !has('gui_running')
     set t_Co=256
 endif
 colorscheme candid
-" let g:dracula_italic = 0
 highlight Normal ctermbg=None
 
 
@@ -117,18 +117,6 @@ let g:mapleader=";"
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" BufExplorer Settings
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:bufExplorerDefaultHelp=0
-let g:bufExplorerShowRelativePath=1
-let g:bufExplorerFindActive=1
-let g:bufExplorerSortBy='name'
-map <leader>o :BufExplorer<cr>
-map <leader>ba :bufdo bd<cr>
-map <leader>bd :Bclose<cr>:tabclose<cr>gT
-
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Window Navigation
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 noremap <c-j> <C-W>j
@@ -145,50 +133,60 @@ cnoremap <C-A> <Home>
 cnoremap <C-E> <End>
 cnoremap <C-K> <C-U>
 
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Delete trailing white space
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 autocmd BufWritePre * :%s/\s\+$//e
 
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" xmllint
+" xmllint pretty printer
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-nmap <leader>x :%!xmllint --format % <CR>
+nmap <leader>xpp :%!xmllint --format % <CR>
+
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " json prettyprinter
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-nmap <leader>jj :%!python -m json.tool <CR>
+nmap <leader>jpp :%!python -m json.tool <CR>
+
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Run python file
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 nmap <leader>r :!python %:p <CR>
 
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " CtrlSF settings
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 vmap <Leader>s <Plug>CtrlSFVwordPath <CR>
+
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Hide search highlights, location list, quickfix list
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 noremap <silent> <leader><esc> :noh <bar> lcl <bar> ccl<cr>
 
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "  Switch CWD to path of open buffer
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 map <leader>cd :cd %:p:h<cr>:pwd<cr>
+
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Split Lines
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 nnoremap K i<CR><Esc>
 
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Remove Recording
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 map q <Nop>
+
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Tmuxline Settings
@@ -205,12 +203,13 @@ let g:tmuxline_status_justify = 'centre'
 "             \'y'    : ['%r', '%a', '%Y'],
 "             \'z'    : '#H',
 " }
-" let g:tmuxline_separators = {
-"             \ 'left' : '',
-"             \ 'left_alt': '⮀',
-"             \ 'right' : '',
-"             \ 'right_alt' : '⮂',
-"             \ 'space' : ' '}
+let g:tmuxline_separators = {
+            \ 'left' : '',
+            \ 'left_alt': '⮀',
+            \ 'right' : '',
+            \ 'right_alt' : '⮂',
+            \ 'space' : ' '}
+
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Airline Settings (statusline)
@@ -225,10 +224,14 @@ let g:airline#extensions#tmuxline#status_justify = "centre"
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Django Testing
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+nnoremap <silent> <leader>t :exe "!tmux send -t 1 'execfile(\"test/%\")' Enter"<CR><C-L>
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Autopairs Settings
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let g:AutoPairsShortcutToggle = '<Leader>m'
-
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Toggle number and relative number
@@ -277,17 +280,21 @@ endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Rooter settings
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:rooter_use_lcd = 1
-let g:rooter_manual_only = 1
-set autochdir
+let g:rooter_change_directory_for_non_project_files = 'current'
+" let g:rooter_use_lcd = 1
+" let g:rooter_manual_only = 1
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " fzf settings
-" ;a will search for the word under the cursor
-" ;g will search for words
+" ;a will search for the content in the project folder
+" ;s will search for words
 " ;f will search for files
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+function! s:find_git_root()
+  return system('git rev-parse --show-toplevel 2> /dev/null')[:-2]
+endfunction
+
 command! -bang -nargs=* Rg
   \ call fzf#vim#grep(
   \ 'rg
@@ -303,28 +310,27 @@ command! -bang -nargs=* Rg
   \           : fzf#vim#with_preview({'options': '--delimiter : --nth 4..', 'dir': FindRootDirectory()}, 'right:50%:hidden', '?'),
   \   <bang>0)
 
-command! -bang -nargs=* Find
-  \ call fzf#vim#grep(
-  \	'rg
-  \ --colors=line:none
-  \ --colors=line:style:bold
-  \ --files
-  \ --fixed-strings
-  \ --follow
-  \ --hidden
-  \ --ignore-case
-  \ --line-number
-  \ --max-columns=150
-  \ --no-ignore
-  \ --no-heading
-  \ --smart-case
-  \ --glob "!{.git,node_modules,vendor}/*"
-  \ --glob "*.{js,json,php,md,styl,jade,html,config,py,cpp,c,go,hs,rb,conf}"
-  \ --glob "/home/jorenza/git/cms/src/*"
-  \ --color "always"'.shellescape(<q-args>).'| tr -d "\017"', 1, {"dir": FindRootDirectory()})
+command! -bang -nargs=? -complete=dir Files
+  \ call fzf#vim#files(<q-args>, fzf#vim#with_preview(), <bang>0)
 
+command! -bang Buffers
+  \ call fzf#vim#buffers({'up': '30%', 'options': '--reverse --margin 3%,15%'}, <bang>0)
+
+
+command! ProjectFiles execute 'Files' FindRootDirectory()
+command! ColorTheme call fzf#run({
+\   'source':
+\     map(split(globpath(&rtp, "colors/*.vim"), "\n"),
+\         "substitute(fnamemodify(v:val, ':t'), '\\..\\{-}$', '', '')"),
+\   'sink':    'colo',
+\   'options': '+m',
+\   'left':    30
+\ })<CR>
 nmap <Leader>a :Rg <C-R><C-W><CR>
-nmap <Leader>g :Rg <cr>
+nmap <Leader>b :Buffers <cr>
+nmap <Leader>c :ColorTheme <cr>
+nmap <Leader>f :ProjectFiles<cr>
+nmap <Leader>s :Rg <cr>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Brian Shenanigans (gf, paths)
@@ -336,25 +342,32 @@ command! BrianOpenFile call BrianOpenFile()
 function! BrianOpenFile()
 try
 	let g:BrianOpenFileName = matchstr(expand("<cfile>"), ".*")
+    echo "1"
+    echo g:BrianOpenFileName
 	execute ':find ' . g:BrianOpenFileName
 catch /.*/
 	try
 		let g:BrianOpenFileName = expand("<cfile>") . ".js"
+        echo "2"
+        echo g:BrianOpenFileName
 		execute ':find ' . g:BrianOpenFileName
 	catch /.*/
 		try
 			let g:BrianOpenFileName = tr(expand("<cfile>"), ".", "/") . ".py"
+            echo "3"
+            echo g:BrianOpenFileName
 			execute ':find ' . g:BrianOpenFileName
 		catch /.*/
 			try
 				let g:BrianOpenFileName = matchstr(expand("<cfile>"), "[^/].*")
-				execute ':find ' . g:BrianOpenFileName
+                echo "4"
+                echo g:BrianOpenFileName
+				" execute ':find ' . g:BrianOpenFileName
 			catch /.*/
 			endtry
 		endtry
 	endtry
 endtry
-"echo g:BrianOpenFileName
 endfunction
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -364,6 +377,12 @@ set path+=/home/jorenza/git/cms/src/247/apps247
 set path+=/home/jorenza/git/cms/src/247/templates_backend
 set path+=/home/jorenza/git/cms/src/247/staticfiles
 
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Emmet settings
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:user_emmet_leader_key='<Leader>'
+let g:user_emmet_install_global = 1
+autocmd FileType html,css EmmetInstall
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Vim Vinegar settings
@@ -371,7 +390,7 @@ set path+=/home/jorenza/git/cms/src/247/staticfiles
 let g:netrw_list_hide='.*\.pyc$'
 augroup netrw_keychange
     autocmd!
-    autocmd filetype netrw call NetrwMapping()
+    autocmd filetype defx call NetrwMapping()
 augroup END
 function! NetrwMapping()
     setl bufhidden=wipe
@@ -381,7 +400,7 @@ endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Colorizer
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-nmap <leader>c :ColorHighlight<CR>
+nmap <leader>h :ColorHighlight<CR>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Deoplete settings
@@ -393,27 +412,21 @@ call deoplete#custom#option('sources', {'_': ['ale', ]})
 " Ale settings
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let g:airline#extensions#ale#enabled = 1
+let g:ale_open_list = 1
 
 " Linters
-let g:ale_linters = {
-            \'python': ['flake8', 'autopep8', 'isort']
-\}
-" let g:ale_lint_on_text_changed = 'never'
-let g:ale_lint_on_text_changed = 0
-let g:ale_lint_on_insert_leave = 0
-let g:ale_lint_on_enter = 0
+let g:ale_lint_on_enter = 1
 let g:ale_lint_on_save = 1
 
 " Fixers
 let g:ale_fixers = {
+            \'python': ['add_blank_lines_for_python_control_statements',
+                        \'autopep8', 'black', 'isort',
+                        \'reorder-python-imports', 'yapf'],
             \'javascript': ['prettier', 'eslint'],
-            \'python': ['flake8', 'autopep8', 'isort']
+            \'*': ['remove_trailing_lines', 'trim_whitespace']
 \}
 let g:ale_fix_on_save = 0
-
-" Completion
-let g:ale_completion_enabled = 1
-set omnifunc=ale#completion#OmniFunc
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Custom Surround setting
