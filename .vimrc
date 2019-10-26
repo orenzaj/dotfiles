@@ -18,8 +18,8 @@ call plug#begin('~/.vim/plugged')
     Plug 'dense-analysis/ale'
     Plug 'dracula/vim', { 'as': 'dracula' }
     Plug 'dyng/ctrlsf.vim'
-    Plug 'edkolev/tmuxline.vim'
     Plug 'flrnd/candid.vim'
+    Plug 'itchyny/lightline.vim'
     Plug 'jiangmiao/auto-pairs'
     Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
     Plug 'junegunn/fzf.vim'
@@ -28,7 +28,6 @@ call plug#begin('~/.vim/plugged')
     Plug 'roxma/nvim-yarp'
     Plug 'roxma/vim-hug-neovim-rpc'
     Plug 'sheerun/vim-polyglot'
-    Plug 'Shougo/deoplete.nvim'
     Plug 'Shougo/unite.vim'
     Plug 'simeji/winresizer'
     Plug 'terryma/vim-multiple-cursors'
@@ -40,8 +39,6 @@ call plug#begin('~/.vim/plugged')
     Plug 'tpope/vim-obsession'
     Plug 'tpope/vim-repeat'
     Plug 'tpope/vim-vinegar'
-    Plug 'vim-airline/vim-airline'
-    Plug 'vim-airline/vim-airline-themes'
     Plug 'Yggdroot/indentLine'
 call plug#end()
 
@@ -51,7 +48,6 @@ call plug#end()
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " set nohidden
 set nocompatible
-set noshowmode
 set noswapfile
 set encoding=utf-8
 filetype plugin on
@@ -188,40 +184,27 @@ nnoremap K i<CR><Esc>
 map q <Nop>
 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Tmuxline Settings
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:tmuxline_status_justify = 'centre'
-" let g:tmuxline_theme = 'airline'
-" let g:tmuxline_preset = 'crosshair'
-" let g:tmuxline_preset = {
-"             \'a'    : '#S',
-"             \'c'    : '#(whoami)',
-"             \'win'  : ['#I', '#W'],
-"             \'cwin'  : ['#I', '#W'],
-"             \'x'    : '#(date)',
-"             \'y'    : ['%r', '%a', '%Y'],
-"             \'z'    : '#H',
-" }
-let g:tmuxline_separators = {
-            \ 'left' : '',
-            \ 'left_alt': '⮀',
-            \ 'right' : '',
-            \ 'right_alt' : '⮂',
-            \ 'space' : ' '}
-
-
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Airline Settings (statusline)
+" Lightline Settings (statusline)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-set laststatus=2
-let g:airline_powerline_fonts = 1
-let g:airline_theme='dracula'
-let g:airline#extensions#tmuxline#enabled = 0
-let g:airline#extensions#tmuxline#status_justify = "centre"
-" let airline#extensions#tmuxline#color_template = 'visual'
-" let airline#extensions#tmuxline#snapshot_file = "/home/jorenza/.tmuxline.conf"
+set noshowmode
+let g:lightline = {
+      \ 'colorscheme': 'darcula',
+      \ 'active': {
+      \   'left': [ [ 'mode', 'paste' ],
+      \             [ 'gitbranch', 'readonly', 'filename' ] ]
+      \ },
+      \ 'component_function': {
+      \   'gitbranch': 'fugitive#head',
+      \   'filename': 'LightlineFilename'
+      \ },
+      \ }
 
+function! LightlineFilename()
+    let filename = expand('%:p') !=# '' ? expand('%:p') : '[No Name]'
+    let modified = &modified ? ' +' : ''
+    return filename . modified
+endfunction
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Django Testing
@@ -342,27 +325,19 @@ command! BrianOpenFile call BrianOpenFile()
 function! BrianOpenFile()
 try
 	let g:BrianOpenFileName = matchstr(expand("<cfile>"), ".*")
-    echo "1"
-    echo g:BrianOpenFileName
 	execute ':find ' . g:BrianOpenFileName
 catch /.*/
 	try
 		let g:BrianOpenFileName = expand("<cfile>") . ".js"
-        echo "2"
-        echo g:BrianOpenFileName
 		execute ':find ' . g:BrianOpenFileName
 	catch /.*/
 		try
 			let g:BrianOpenFileName = tr(expand("<cfile>"), ".", "/") . ".py"
-            echo "3"
-            echo g:BrianOpenFileName
 			execute ':find ' . g:BrianOpenFileName
 		catch /.*/
 			try
 				let g:BrianOpenFileName = matchstr(expand("<cfile>"), "[^/].*")
-                echo "4"
-                echo g:BrianOpenFileName
-				" execute ':find ' . g:BrianOpenFileName
+				execute ':find ' . g:BrianOpenFileName
 			catch /.*/
 			endtry
 		endtry
@@ -405,13 +380,13 @@ nmap <leader>h :ColorHighlight<CR>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Deoplete settings
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:deoplete#enable_at_startup = 1
-call deoplete#custom#option('sources', {'_': ['ale', ]})
+" let g:deoplete#enable_at_startup = 1
+" call deoplete#custom#option('sources', {'_': ['ale', ]})
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Ale settings
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:airline#extensions#ale#enabled = 1
+" let g:airline#extensions#ale#enabled = 1
 let g:ale_open_list = 1
 
 " Linters

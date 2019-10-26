@@ -3,7 +3,7 @@
 ######################################################################
 # Main
 ######################################################################
-export PATH='/home/jorenza/bin:/home/jorenza/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/usr/local/go/bin:/home/jorenza/go/bin:/home/jorenza/.pyenv/bin:/home/jorenza/.cargo/bin'
+export PATH='/home/jorenza/bin:/home/jorenza/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/usr/local/go/bin:/home/jorenza/go/bin:/home/jorenza/.pyenv/bin:/home/jorenza/.cargo/bin:/home/jorenza/.pyenv/shims'
 
 
 ######################################################################
@@ -128,6 +128,7 @@ if [ -f ~/.bash_aliases ]; then . ~/.bash_aliases ; fi
 
 # Colors
 if [ -f ~/.bash_colors ]; then . ~/.bash_colors ; fi
+if [ -f ~/.dircolors ]; then . ~/.dircolors ; fi
 
 # Completion
 if [ -f /etc/bash_completion ]; then . /etc/bash_completion ; fi
@@ -139,7 +140,5 @@ if [ -f ~/.bash_prompt ]; then . ~/.bash_prompt ; fi
 if [ -f ~/.git-completion.bash ]; then . ~/.git-completion.bash ; fi
 if [ -f ~/.git-prompt.sh ]; then . ~/.git-prompt.sh ; fi
 
-if [ -z "$TMUX" ]; then
-  tmux new-session -A -s parallels
-fi
 ######################
+cd ~
