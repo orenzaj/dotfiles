@@ -18,29 +18,5 @@ if [ ! -d "$HOME/.pyenv/plugins/pyenv-virtualenv" ] ; then
     git clone https://github.com/yyuu/pyenv-virtualenv.git $HOME/.pyenv/plugins/pyenv-virtualenv
 fi
 
-# Set root environment variable if not set.
-if grep -q "PYENV_ROOT" $HOME/.bash_env; then
-    echo -e "\n\$PYENV_ROOT already set."
-else
-    echo "export PYENV_ROOT=$HOME/.pyenv" >> $HOME/.bash_env
-    echo -e "\nSetting PYENV_ROOT to $HOME/.pyenv"
-fi
-
-# Append bin environment variable to path if not set.
-if grep -q "pyenv" $HOME/.bash_paths; then
-    echo -e "\$PYENV_ROOT/bin already in \$PATH"
-else
-    echo "export PATH=$PATH:$HOME/.pyenv/bin" >> $HOME/.bash_paths
-    echo -e "Adding $HOME/.pyenv/bin to PATH"
-fi
-
-# Enable shims
-if command -v pyenv 1>/dev/null 2>&1; then
-    eval "$(pyenv init -)"
-fi
-if ! grep -q "pyenv()" $HOME/.bash_shims; then
-    echo "eval $(pyenv init -)" >> $HOME/.mybashrc
-fi
-
-echo "pyenv installation complete."
 source $HOME/.mybashrc
+echo "pyenv installation complete."

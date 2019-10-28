@@ -47,7 +47,7 @@ call plug#end()
 " Misc
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " set nohidden
-set nocompatible
+" set nocompatible
 set noswapfile
 set encoding=utf-8
 filetype plugin on
