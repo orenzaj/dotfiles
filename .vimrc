@@ -11,36 +11,37 @@ endif
 " VimPlug Settings
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 call plug#begin('~/.vim/plugged')
-    Plug 'airblade/vim-rooter'
-    Plug 'airblade/vim-gitgutter'
-    Plug 'aldantas/vim-custom-surround'
-    Plug 'chrisbra/Colorizer'
-    Plug 'dense-analysis/ale'
-    Plug 'dracula/vim', { 'as': 'dracula' }
-    Plug 'dyng/ctrlsf.vim'
-    Plug 'flrnd/candid.vim'
-    Plug 'itchyny/lightline.vim'
-    Plug 'jiangmiao/auto-pairs'
-    Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-    Plug 'junegunn/fzf.vim'
-    Plug 'mattn/emmet-vim'
-    Plug 'roxma/vim-tmux-clipboard'
-    Plug 'roxma/nvim-yarp'
-    Plug 'roxma/vim-hug-neovim-rpc'
-    Plug 'sheerun/vim-polyglot'
-    Plug 'Shougo/unite.vim'
-    Plug 'Shougo/vimfiler.vim'
-    Plug 'simeji/winresizer'
-    Plug 'terryma/vim-multiple-cursors'
-    Plug 'tmhedberg/matchit'
-    Plug 'tpope/vim-commentary'
-    Plug 'tpope/vim-fugitive'
-    Plug 'tpope/vim-sensible'
-    Plug 'tpope/vim-surround'
-    Plug 'tpope/vim-obsession'
-    Plug 'tpope/vim-repeat'
-    Plug 'Yggdroot/indentLine'
-    Plug 'ryanoasis/vim-devicons'
+Plug 'airblade/vim-rooter'
+Plug 'airblade/vim-gitgutter'
+Plug 'aldantas/vim-custom-surround'
+Plug 'chrisbra/Colorizer'
+Plug 'dense-analysis/ale'
+Plug 'dracula/vim', { 'as': 'dracula' }
+Plug 'dyng/ctrlsf.vim'
+Plug 'flrnd/candid.vim'
+Plug 'itchyny/lightline.vim'
+Plug 'jiangmiao/auto-pairs'
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf.vim'
+Plug 'mattn/emmet-vim'
+Plug 'roxma/vim-tmux-clipboard'
+Plug 'roxma/nvim-yarp'
+Plug 'roxma/vim-hug-neovim-rpc'
+Plug 'sheerun/vim-polyglot'
+Plug 'Shougo/defx.nvim'
+Plug 'Shougo/unite.vim'
+Plug 'Shougo/vimfiler.vim'
+Plug 'simeji/winresizer'
+Plug 'terryma/vim-multiple-cursors'
+Plug 'tmhedberg/matchit'
+Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-sensible'
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-obsession'
+Plug 'tpope/vim-repeat'
+Plug 'Yggdroot/indentLine'
+Plug 'ryanoasis/vim-devicons'
 call plug#end()
 
 
@@ -190,38 +191,31 @@ map q <Nop>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set noshowmode
 let g:lightline = {
-      \ 'colorscheme': 'darcula',
-      \ 'active': {
-      \   'left': [ [ 'mode', 'paste' ],
-      \             [ 'gitbranch', 'readonly', 'filetype', 'filename' ] ]
-      \ },
-      \ 'component_function': {
-      \   'gitbranch': 'fugitive#head',
-      \   'filename': 'LightlineFilename',
-      \   'filetype': 'MyFiletype',
-      \   'fileformat': 'MyFileformat',
-      \ },
-      \ }
+            \ 'colorscheme': 'darcula',
+            \ 'active': {
+            \   'left': [ [ 'mode', 'paste' ],
+            \             [ 'gitbranch', 'readonly', 'filename' ] ]
+            \ },
+            \ 'component_function': {
+            \   'gitbranch': 'fugitive#head',
+            \   'filename': 'LightlineFilename'
+            \ },
+            \ }
 
 function! MyFiletype()
-  return winwidth(0) > 70 ? (strlen(&filetype) ? &filetype . ' ' . WebDevIconsGetFileTypeSymbol() : 'no ft') : ''
+    return winwidth(0) > 70 ? (strlen(&filetype) ? &filetype . ' ' . WebDevIconsGetFileTypeSymbol() : 'no ft') : ''
 endfunction
 
 function! MyFileformat()
-  return winwidth(0) > 70 ? (&fileformat . ' ' . WebDevIconsGetFileFormatSymbol()) : ''
+    return winwidth(0) > 70 ? (&fileformat . ' ' . WebDevIconsGetFileFormatSymbol()) : ''
 endfunction
 
 function! LightlineFilename()
-  return &filetype ==# 'vimfiler' ? vimfiler#get_status_string() :
-        \ &filetype ==# 'unite' ? unite#get_status_string() :
-        \ &filetype ==# 'vimshell' ? vimshell#get_status_string() :
-        \ expand('%:p') !=# '' ? expand('%:p') : '[No Name]'
+    return &filetype ==# 'vimfiler' ? WebDevIconsGetFileTypeSymbol() . ' ' .  vimfiler#get_status_string() :
+                \ &filetype ==# 'unite' ? WebDevIconsGetFileTypeSymbol() . ' ' .  unite#get_status_string() :
+                \ &filetype ==# 'vimshell' ? WebDevIconsGetFileTypeSymbol() . ' ' .  vimshell#get_status_string() :
+                \ expand('%:p') !=# '' ? WebDevIconsGetFileTypeSymbol() . ' ' . expand('%:p') : '[No Name]'
 endfunction
-" function! LightlineFilename()
-"     let filename = expand('%:p') !=# '' ? expand('%:p') : '[No Name]'
-"     let modified = &modified ? ' +' : ''
-"     return filename . modified
-" endfunction
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Django Testing
@@ -241,7 +235,7 @@ set relativenumber
 noremap <leader>n :call ToggleNumber()<cr>
 function! ToggleNumber()
     IndentLinesToggle
-	GitGutterToggle
+    GitGutterToggle
     set number!
     set relativenumber!
 endfunction
@@ -272,8 +266,8 @@ nnoremap <leader>w :w!<cr>
 " RipGrep settings
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 if executable('rg')
-	set grepprg=rg\ --vimgrep
-	set grepformat=%f:%l:%c:%m
+    set grepprg=rg\ --vimgrep
+    set grepformat=%f:%l:%c:%m
 endif
 
 
@@ -289,45 +283,45 @@ let g:rooter_change_directory_for_non_project_files = 'current'
 " FZF settings
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 command! -bang -nargs=* Rg
-  \ call fzf#vim#grep(
-  \ 'rg
-  \ --column
-  \ --glob "*.{py,html}"
-  \ --glob "!{.git,node_modules,.min.js}/*"
-  \ --hidden
-  \ --smart-case
-  \ --line-number
-  \ --no-heading
-  \ --color=always '.shellescape(<q-args>), 1,
-  \   <bang>0 ? fzf#vim#with_preview({'options': '--delimiter : --nth 4..', 'dir': FindRootDirectory()}, 'up:60%')
-  \           : fzf#vim#with_preview({'options': '--delimiter : --nth 4..', 'dir': FindRootDirectory()}, 'right:50%:hidden', '?'),
-  \   <bang>0)
+            \ call fzf#vim#grep(
+            \ 'rg
+            \ --column
+            \ --glob "*.{py,html}"
+            \ --glob "!{.git,node_modules,.min.js}/*"
+            \ --hidden
+            \ --smart-case
+            \ --line-number
+            \ --no-heading
+            \ --color=always '.shellescape(<q-args>), 1,
+            \   <bang>0 ? fzf#vim#with_preview({'options': '--delimiter : --nth 4..', 'dir': FindRootDirectory()}, 'up:60%')
+            \           : fzf#vim#with_preview({'options': '--delimiter : --nth 4..', 'dir': FindRootDirectory()}, 'right:50%:hidden', '?'),
+            \   <bang>0)
 
 command! -bang Buffers
-  \ call fzf#vim#buffers({'up': '30%', 'options': '--reverse --margin 3%,15%'}, <bang>0)
+            \ call fzf#vim#buffers({'up': '30%', 'options': '--reverse --margin 3%,15%'}, <bang>0)
 
 " Files + devicons
 function! Fzf_files_with_dev_icons(command)
-    let l:fzf_files_options = '--preview "bat --color always --style numbers {2..} | head -'.&lines.'"'
+    let l:fzf_files_options = '--ansi --preview "bat --color always --style numbers {2..} | head -'.&lines.'"'
     function! s:edit_devicon_prepended_file(item)
         let l:file_path = a:item[4:-1]
         execute 'silent e' l:file_path
     endfunction
     call fzf#run({
-                \ 'source': a:command.' | devicon-lookup',
-                \ 'sink':   function('s:edit_devicon_prepended_file'),
+                \ 'source': a:command . ' | devicon-lookup',
+                \ 'sink': function('s:edit_devicon_prepended_file'),
                 \ 'options': '-m ' . l:fzf_files_options,
-                \ 'down':    '40%' })
+                \ 'down': '40%' })
 endfunction
 
 function! Fzf_git_diff_files_with_dev_icons()
     let l:fzf_files_options = '--ansi --preview "sh -c \"(git diff --color=always -- {3..} | sed 1,4d; bat --color always --style numbers {3..}) | head -'.&lines.'\""'
 
     function! s:edit_devicon_prepended_file_diff(item)
-        echom a:item
+        " echom a:item
         let l:file_path = a:item[7:-1]
-        echom l:file_path
-        let l:first_diff_line_number = system("git diff -U0 ".l:file_path." | rg '^@@.*\+' -o | rg '[0-9]+' -o | head -1")
+        " echom l:file_path
+        let l:first_diff_line_number = system("git diff -U0 " . l:file_path . " | rg '^@@.*\+' -o | rg '[0-9]+' -o | head -1")
         execute 'silent e' l:file_path
         execute l:first_diff_line_number
     endfunction
@@ -367,26 +361,26 @@ nmap <Leader>p :call BrianPathList()<cr>
 
 command! BrianOpenFile call BrianOpenFile()
 function! BrianOpenFile()
-try
-	let g:BrianOpenFileName = matchstr(expand("<cfile>"), ".*")
-	execute ':find ' . g:BrianOpenFileName
-catch /.*/
-	try
-		let g:BrianOpenFileName = expand("<cfile>") . ".js"
-		execute ':find ' . g:BrianOpenFileName
-	catch /.*/
-		try
-			let g:BrianOpenFileName = tr(expand("<cfile>"), ".", "/") . ".py"
-			execute ':find ' . g:BrianOpenFileName
-		catch /.*/
-			try
-				let g:BrianOpenFileName = matchstr(expand("<cfile>"), "[^/].*")
-				execute ':find ' . g:BrianOpenFileName
-			catch /.*/
-			endtry
-		endtry
-	endtry
-endtry
+    try
+        let g:BrianOpenFileName = matchstr(expand("<cfile>"), ".*")
+        execute ':find ' . g:BrianOpenFileName
+    catch /.*/
+        try
+            let g:BrianOpenFileName = expand("<cfile>") . ".js"
+            execute ':find ' . g:BrianOpenFileName
+        catch /.*/
+            try
+                let g:BrianOpenFileName = tr(expand("<cfile>"), ".", "/") . ".py"
+                execute ':find ' . g:BrianOpenFileName
+            catch /.*/
+                try
+                    let g:BrianOpenFileName = matchstr(expand("<cfile>"), "[^/].*")
+                    execute ':find ' . g:BrianOpenFileName
+                catch /.*/
+                endtry
+            endtry
+        endtry
+    endtry
 endfunction
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -404,22 +398,74 @@ let g:user_emmet_install_global = 1
 autocmd FileType html,css EmmetInstall
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Vim Vinegar settings
+" Vim Filer settings
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" let g:netrw_list_hide='.*\.pyc$'
+let g:vimfiler_as_default_explorer = 1
+let g:vimfiler_tree_indentation = 3 " Indentation length of tree.
+let g:vimfiler_ignore_pattern = ['^\.git$', '^\.DS_Store$'] " Disable showing certain files and folders.
+let g:vimfiler_file_icon = ''
+let g:vimfiler_tree_leaf_icon = '' " Disable leaf icon for more simplicity.
+let g:vimfiler_tree_closed_icon = '▸'
+let g:vimfiler_tree_opened_icon = '▾'
+let g:vimfiler_marked_file_icon = '✓'
+let g:vimfiler_readonly_file_icon = '✗'
+nmap <silent> - :VimFilerExplorer<CR>
 
-augroup netrw_keychange
+" Custom options.
+call vimfiler#custom#profile(
+            \ 'default',
+            \ 'context',
+            \ {
+            \	'explorer': 1,
+            \	'find': 1,
+            \	'safe': 0,
+            \	'split': 1,
+            \	'status': 0,
+            \	'toggle': 1,
+            \	'winwidth': 35
+            \ }
+            \ )
+" Specific options to use when vimfiler buffer opened.
+augroup VimFilerLaunchOptions
     autocmd!
-    autocmd filetype vimfiler call VimFilerMapping()
+
+    " Disable line numbers completely.
+    autocmd FileType vimfiler setlocal nonumber norelativenumber
+
+    " Disable tilde characters.
+    autocmd FileType vimfiler highlight EndOfBuffer guifg=bg
+
+    " Unbind <C-l> for the sake of other key bindings.
+    autocmd FileType vimfiler nunmap <buffer> <C-l>
+
+    " Unbind <S-k>.
+    autocmd FileType vimfiler nunmap <buffer> K
+
+    " Change the default refresh binding.
+    autocmd FileType vimfiler nmap <buffer> <C-r> <Plug>(vimfiler_redraw_screen)
+
+    " ;<esc> closes vimfiler
+    autocmd FileType vimfiler nmap <buffer> <leader><esc> <Plug>(vimfiler_exit)
 augroup END
 
-function!  VimFilerMapping()
-    setl bufhidden=wipe
-    noremap <buffer>q :bd<CR>
-endfunction
+" Automatically quit Vim if vimfiller is last and only buffer.
+augroup VimFilerCloseIfLastOne
+    autocmd!
+    autocmd BufEnter *
+                \ if (!has('vim_starting') && winnr("$") == 1 && &filetype ==# 'vimfiler') |
+                \	quit |
+                \ endif
+augroup END
 
-let g:vimfiler_as_default_explorer = 1
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Dev Icons settings
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:webdevicons_enable = 1
+let g:DevIconsEnableFoldersOpenClose = 1 " Enable open and close folder glyph flags.
+let g:WebDevIconsUnicodeDecorateFolderNodes = 1 " Enable folder glyph flag.
+let g:WebDevIconsUnicodeDecorateFolderNodesDefaultSymbol = '' " Disable folder icons.
 let g:webdevicons_enable_vimfiler = 1
+let g:webdevicons_enable_unite = 1
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Colorizer
@@ -445,11 +491,11 @@ let g:ale_lint_on_save = 1
 " Fixers
 let g:ale_fixers = {
             \'python': ['add_blank_lines_for_python_control_statements',
-                        \'autopep8', 'black', 'isort',
-                        \'reorder-python-imports', 'yapf'],
+            \'autopep8', 'black', 'isort',
+            \'reorder-python-imports', 'yapf'],
             \'javascript': ['prettier', 'eslint'],
             \'*': ['remove_trailing_lines', 'trim_whitespace']
-\}
+            \}
 let g:ale_fix_on_save = 0
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
