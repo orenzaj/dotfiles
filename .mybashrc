@@ -59,15 +59,15 @@ export GIT_PS1_SHOWDIRTYSTATE=1
 
 ######################################################################
 # FZF
-# Ctrl + P will open file in vim
 ######################################################################
 [ -f ~/.fzf.bash  ] && source ~/.fzf.bash
 
-# RG PATH
+# RipGrep File Finder
 export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow -g "!{.git,node_modules}/*" 2> /dev/null'
 
-# export FZF_DEFAULT_COMMAND="fd --type file --follow --hidden --color=always --exclude .git . $HOME"
-export FZF_DEFAULT_OPTS='--ansi --height 40% --layout=reverse --border'
+# FD File Finder
+# export FZF_DEFAULT_COMMAND="fd --type file --follow --hidden --color=always --exclude .git"
+# export FZF_DEFAULT_OPTS='--ansi --height 40% --layout=reverse --border'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_ALT_C_COMMAND="fd -t d"
 

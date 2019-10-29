@@ -29,6 +29,7 @@ call plug#begin('~/.vim/plugged')
     Plug 'roxma/vim-hug-neovim-rpc'
     Plug 'sheerun/vim-polyglot'
     Plug 'Shougo/unite.vim'
+    Plug 'Shougo/vimfiler.vim'
     Plug 'simeji/winresizer'
     Plug 'terryma/vim-multiple-cursors'
     Plug 'tmhedberg/matchit'
@@ -38,15 +39,15 @@ call plug#begin('~/.vim/plugged')
     Plug 'tpope/vim-surround'
     Plug 'tpope/vim-obsession'
     Plug 'tpope/vim-repeat'
-    Plug 'tpope/vim-vinegar'
     Plug 'Yggdroot/indentLine'
+    Plug 'ryanoasis/vim-devicons'
 call plug#end()
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Misc
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" set nohidden
+set nohidden
 " set nocompatible
 set noswapfile
 set encoding=utf-8
@@ -192,19 +193,35 @@ let g:lightline = {
       \ 'colorscheme': 'darcula',
       \ 'active': {
       \   'left': [ [ 'mode', 'paste' ],
-      \             [ 'gitbranch', 'readonly', 'filename' ] ]
+      \             [ 'gitbranch', 'readonly', 'filetype', 'filename' ] ]
       \ },
       \ 'component_function': {
       \   'gitbranch': 'fugitive#head',
-      \   'filename': 'LightlineFilename'
+      \   'filename': 'LightlineFilename',
+      \   'filetype': 'MyFiletype',
+      \   'fileformat': 'MyFileformat',
       \ },
       \ }
 
-function! LightlineFilename()
-    let filename = expand('%:p') !=# '' ? expand('%:p') : '[No Name]'
-    let modified = &modified ? ' +' : ''
-    return filename . modified
+function! MyFiletype()
+  return winwidth(0) > 70 ? (strlen(&filetype) ? &filetype . ' ' . WebDevIconsGetFileTypeSymbol() : 'no ft') : ''
 endfunction
+
+function! MyFileformat()
+  return winwidth(0) > 70 ? (&fileformat . ' ' . WebDevIconsGetFileFormatSymbol()) : ''
+endfunction
+
+function! LightlineFilename()
+  return &filetype ==# 'vimfiler' ? vimfiler#get_status_string() :
+        \ &filetype ==# 'unite' ? unite#get_status_string() :
+        \ &filetype ==# 'vimshell' ? vimshell#get_status_string() :
+        \ expand('%:p') !=# '' ? expand('%:p') : '[No Name]'
+endfunction
+" function! LightlineFilename()
+"     let filename = expand('%:p') !=# '' ? expand('%:p') : '[No Name]'
+"     let modified = &modified ? ' +' : ''
+"     return filename . modified
+" endfunction
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Django Testing
@@ -269,15 +286,8 @@ let g:rooter_change_directory_for_non_project_files = 'current'
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" fzf settings
-" ;a will search for the content in the project folder
-" ;s will search for words
-" ;f will search for files
+" FZF settings
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-function! s:find_git_root()
-  return system('git rev-parse --show-toplevel 2> /dev/null')[:-2]
-endfunction
-
 command! -bang -nargs=* Rg
   \ call fzf#vim#grep(
   \ 'rg
@@ -293,27 +303,61 @@ command! -bang -nargs=* Rg
   \           : fzf#vim#with_preview({'options': '--delimiter : --nth 4..', 'dir': FindRootDirectory()}, 'right:50%:hidden', '?'),
   \   <bang>0)
 
-command! -bang -nargs=? -complete=dir Files
-  \ call fzf#vim#files(<q-args>, fzf#vim#with_preview(), <bang>0)
-
 command! -bang Buffers
   \ call fzf#vim#buffers({'up': '30%', 'options': '--reverse --margin 3%,15%'}, <bang>0)
 
+" Files + devicons
+function! Fzf_files_with_dev_icons(command)
+    let l:fzf_files_options = '--preview "bat --color always --style numbers {2..} | head -'.&lines.'"'
+    function! s:edit_devicon_prepended_file(item)
+        let l:file_path = a:item[4:-1]
+        execute 'silent e' l:file_path
+    endfunction
+    call fzf#run({
+                \ 'source': a:command.' | devicon-lookup',
+                \ 'sink':   function('s:edit_devicon_prepended_file'),
+                \ 'options': '-m ' . l:fzf_files_options,
+                \ 'down':    '40%' })
+endfunction
 
-command! ProjectFiles execute 'Files' FindRootDirectory()
-command! ColorTheme call fzf#run({
-\   'source':
-\     map(split(globpath(&rtp, "colors/*.vim"), "\n"),
-\         "substitute(fnamemodify(v:val, ':t'), '\\..\\{-}$', '', '')"),
-\   'sink':    'colo',
-\   'options': '+m',
-\   'left':    30
-\ })<CR>
+function! Fzf_git_diff_files_with_dev_icons()
+    let l:fzf_files_options = '--ansi --preview "sh -c \"(git diff --color=always -- {3..} | sed 1,4d; bat --color always --style numbers {3..}) | head -'.&lines.'\""'
+
+    function! s:edit_devicon_prepended_file_diff(item)
+        echom a:item
+        let l:file_path = a:item[7:-1]
+        echom l:file_path
+        let l:first_diff_line_number = system("git diff -U0 ".l:file_path." | rg '^@@.*\+' -o | rg '[0-9]+' -o | head -1")
+        execute 'silent e' l:file_path
+        execute l:first_diff_line_number
+    endfunction
+
+    call fzf#run({
+                \ 'source': 'git -c color.status=always status --short --untracked-files=all | devicon-lookup',
+                \ 'sink':   function('s:edit_devicon_prepended_file_diff'),
+                \ 'options': '-m ' . l:fzf_files_options,
+                \ 'down':    '40%' })
+endfunction
+
+
+" THESE ARE MOUSE COMPATIBLE
+" ;gd will search git diff files with DevIcons
+map <Leader>gd :call Fzf_git_diff_files_with_dev_icons()<CR> " :GFiles?
+
+" ;gs  will search git status with DevIcons
+map <Leader>gs :call Fzf_files_with_dev_icons("git ls-files \| uniq")<CR> " :GFiles
+
+" ;f will search files with DevIcons
+nmap <Leader>f :call Fzf_files_with_dev_icons($FZF_DEFAULT_COMMAND)<CR> " :Files
+
+" ;a will search for the content in the project folder
 nmap <Leader>a :Rg <C-R><C-W><CR>
-nmap <Leader>b :Buffers <cr>
-nmap <Leader>c :ColorTheme <cr>
-nmap <Leader>f :ProjectFiles<cr>
+
+" ;s will search for words at root level /
 nmap <Leader>s :Rg <cr>
+
+" ;o will open the buffers
+nmap <Leader>o :Buffers <cr>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Brian Shenanigans (gf, paths)
@@ -362,15 +406,20 @@ autocmd FileType html,css EmmetInstall
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Vim Vinegar settings
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:netrw_list_hide='.*\.pyc$'
+" let g:netrw_list_hide='.*\.pyc$'
+
 augroup netrw_keychange
     autocmd!
-    autocmd filetype defx call NetrwMapping()
+    autocmd filetype vimfiler call VimFilerMapping()
 augroup END
-function! NetrwMapping()
+
+function!  VimFilerMapping()
     setl bufhidden=wipe
     noremap <buffer>q :bd<CR>
 endfunction
+
+let g:vimfiler_as_default_explorer = 1
+let g:webdevicons_enable_vimfiler = 1
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Colorizer
