@@ -1,52 +1,98 @@
-function centenv() { INVENV=$(python -c 'import sys; print ("1" if hasattr(
-    sys, "real_prefix") else "0")');
-    if [ $INVENV = 0 ]; then
-        eval centactivate;
-        clear;
+function devenv() {
+    # Usage: devenv <env_name> [options]
+    # Options: 
+    #   -a          Force to activate an environment (default)
+    #   -d          Force to deactivate an environment
+    #   -t          Force to toggle an environment
+    if [[ -n $1 ]]; then
+        local CURRENV=$(python -c 'import sys; print(getattr(sys, "prefix", "").split("/")[-1])');
+        if [[ -n $CURRENV ]]; then
+            local DEACTIVATE=$(echo "$@" | grep -e '-d')
+            if [[ -n $DEACTIVATE ]]; then 
+                source deactivate 2> /dev/null
+            else 
+                local TOGGLE=$(echo "$@" | grep -e '-t')
+                if [[ -n $TOGGLE ]]; then 
+                    source deactivate 2> /dev/null
+                fi 
+                local ENVNAME=$(echo $1 | sed 's/-//' | awk -F 'env' '{print $1"-env"}');
+                if [[ $CURRENV != $ENVNAME ]]; then
+                    pyenv activate $ENVNAME
+                    local ENVPATH=$(echo $ENVNAME | sed 's/-env/path/');
+                    eval $ENVPATH
+                fi
+            fi
+        fi
+    fi
+}
+
+function cmsreimportdb() {
+    eval restartdockers
+
+    if [ -f "$HOME/.ssh/config" ]; then
+        local SERVERIDX;
+        echo "Choosing the server to pull the database...";
+        sed -n "s/Host//p" ~/.ssh/config | grep -iv name | awk '{print "    ["NR"]", $1}'
+        read -p "Please enter the corresponding number: " SERVERIDX;
+
+        local SERVERCOUNT=$(sed -n "s/Host//p" ~/.ssh/config | grep -iv name | awk '{print "    ["NR"]", $1}' | wc -l);
+        if [ $SERVERIDX -gt 0 ] && [ $SERVERIDX -le $SERVERCOUNT ]; then
+            local CHOSENSERVER=$(sed -n "s/Host//p" ~/.ssh/config | grep -iv name | awk '{print "    ["NR"]", $1}' | grep $SERVERIDX | awk '{print $2}');
+        else
+            echo "Invalid input.";
+            return;
+        fi
     else
-        eval centpath;
+        local $SERVERIP;
+        local $SERVERUSER;
+        local $SERVERPORT;
+        read -p "Please enter the IP address of the server: " $SERVERIP;
+        read -p "Please enter your username for the server: " $SERVERUSER;
+        read -p "Please enter the port of the server: " $SERVERPORT;
+        local CHOSENSERVER="$SERVERUSER@$SERVERIP:$SERVERPORT";
     fi
-};
+    CMS_DB_SERVER_LOCATION=$CHOSENSERVER;
 
-function cmsenv() {
-    INVENV=$(python -c 'import sys; print ("1" if hasattr(sys, "real_prefix") else "0")');
-    if [ $INVENV = 0 ]; then
-        eval cmsactivate;
-        clear;
-    else
-        eval cmspath;
+    echo -e "\nGrabbing CMS database info your local.py\n..."
+    eval cmspath
+    cd settings
+    CMS_PSQL_DB=$(grep -o '"NAME.*"' local.py | awk '{print $2}' | sed 's/"//g')
+    CMS_PSQL_USER=$(grep -o '"USER.*"' local.py | awk '{print $2}' | sed 's/"//g')
+    CMS_PSQL_HOST=$(grep -o '"HOST.*"' local.py | awk '{print $2}' | sed 's/"//g')
+
+    if [ -z "$CMS_PSQL_DB" ] || [ -z "$CMS_PSQL_USER" ] || [ -z "$CMS_PSQL_HOST" ]; then
+        echo -e "\nUnable to grab required information from local.py."
+        echo -e "\nPlease enter the following information (found in local.py) to reimport your cms database:"
+        read -p "CMS Database Name: " CMS_PSQL_DB;
+        read -p "CMS Username: " CMS_PSQL_USER;
+        read -p "CMS Host: " CMS_PSQL_HOST;
     fi
-};
+    echo "Done."
 
-function cmslocalsite(){
-    COMMID="$1";
-    DOMAIN="$2";
-    if [ $DOMAIN != *".com"* ]; then
-        DOMAIN="$2.com";
-    fi
+    echo -e "\nFinding latest database dump in '$CMS_DB_SERVER_LOCATION'\n...";
+    local FINDDB_CMD="find /data/db -name \x24(ls -1St /data/db | head -1)"
+    local FINDDB="ssh $CMS_DB_SERVER_LOCATION '$FINDDB_CMD'"
+    echo -e "Found: $(echo -e $FINDDB | sh)"
 
-    # Set up directories
-    NEW_DOMAIN="$1.localsite.viaryland.com";
-    TEMPLATE_STORAGE="/home/jorenza/git/cms/src/template_storage/designs"
-    COMM_QUERY="Community.objects.get(id=$COMMID)";
-    rm -rf $TEMPLATE_STORAGE/$NEW_DOMAIN;
-    mkdir $TEMPLATE_STORAGE/$NEW_DOMAIN;
+    local RAWDB_CMD="'$FINDDB_CMD | xargs cat'";
+    local RAWDB="ssh $CMS_DB_SERVER_LOCATION $RAWDB_CMD"
+    local UNZIPDB_CMD="gzip -d | psql -U $USER -h 172.17.0.1 -f - cms"
+    local REIMPORT_CMD="$RAWDB | $UNZIPDB_CMD"
 
-    # The first two lines of python code the file to replace.
-    LINE1="community = \"$COMM_QUERY\"";
-    # LINE2="domain = \"$DOMAIN\"";
-    # LINE3="new_domain = \"$NEW_DOMAIN\"";
+    echo -e "\nKilling the cms\n...";
+    eval cmskill;
+    echo -e "Killed.";
 
-    # Modify django shell script
-    DOMAIN_PY="/home/jorenza/git/cms/src/247/test/domain.py"
-    sed -i "1s/^.*$/$LINE1/" $DOMAIN_PY;
-    sed -i "2s/^.*$/$LINE2/" $DOMAIN_PY;
-    sed -i "3s/^.*$/$LINE3/" $DOMAIN_PY;
+    echo -e "\nReinitializing database '$CMS_PSQL_DB'\n...";
+    dropdb $CMS_PSQL_DB;
+    createdb $CMS_PSQL_DB;
+    echo -e "Reinitialized.";
 
-    # Run django shell script
-    eval cmsenv;
-    echo "python /home/jorenza/git/cms/src/247/manage.py shell_plus --quiet < $DOMAIN_PY" | sh;
-};
+    echo -e "\nRemporting '$CMS_PSQL_DB' database using the following command:";
+    echo -e "$REIMPORT_CMD";
+    echo -e "$REIMPORT_CMD | sh";
+    eval cmsupdate;
+}
 
 # Mongo
 alias mongothemelist="mongofiles -h 172.17.0.1 -d apts247_secureapps_themes --prefix=\$(basename \$PWD) --quiet list"
@@ -57,44 +103,26 @@ alias mongodesigndir="mongodesignlist | awk '{print \"mkdir \"\$2}' | cut -d'/' 
 alias mongogetalldesigns="mongodesigndir && mongodesignlist | awk '{print \"mongofiles -h 172.17.0.1 -d apts247_secureapps_designs --prefix=\$(basename \$PWD) get \"\$1}' | sh"
 
 # CMS
-alias cmsactivate="source ~/git/cms/cms-env/bin/activate && cmspath"
-alias cmscelery="cmsenv && celery -A celery_init worker --loglevel=debug"
-alias cmspulldb='ssh shallowhal "cd /data/db && cat \$(ls -S1 cms*.gz|head -n 1)"|gzip -d|psql -U jorenza -h 172.17.0.1 -f - cms'
-alias cmsreimportdb="stopdockers && dropdb cms && createdb cms && cmspulldb && cmsupdate"
-alias cmspulldbtomservo='ssh tomservo "cd /data/db && cat \$(ls -S1 cms*.gz|head -n 1)"|gzip -d|psql -U jorenza -h 172.17.0.1 -f - cms'
-alias cmspulldbext='ssh shallowhalext "cd /data/db && cat \$(ls -S1 cms*.gz|head -n 1)"|gzip -d|psql -U jorenza -h 172.17.0.1 -f - cms'
-alias cmsreimportdbext="stopdockers && dropdb cms && createdb cms && cmspulldbext"
-alias cmsdb='scp shallowhal:$(ssh shallowhal ls -dt /data/db/cms*sql* | head -1) /home/jorenza/Downloads/cmsdb/cms.sql.Z'
+alias cmscelery="devenv cms && celery -A celery_init worker --loglevel=debug"
+alias cmsdb="restartdockers && cmsdbimporter"
 alias cmsdup='find . | grep migrations | grep "/[0-9]\+" | grep -v 'pyc' | sed -e "s/\([^/][^/][^/][^/]\)[^/]\+$/\1/" | sort | uniq -c | less'
-alias cmsimport="stopdockers && dropdb cms && createdb cms && zcat ~/Downloads/cmsdb/cms.sql.Z | psql -f - cms"
 alias cmskill="lsof -i:8000 | grep [p]ython | awk '{print \"kill \"\$2}' | sh"
-alias cmsmake="cmsenv && python manage.py makemigrations --noinput"
-alias cmsmigrate="cmsenv && python manage.py migrate --noinput"
+alias cmsmake="devenv cms && python manage.py makemigrations --noinput"
+alias cmsmigrate="devenv cms && python manage.py migrate --noinput"
 alias cmspath="cd ~/git/cms/src/247 && pyclean"
 alias cmsint="cmspath && cd apps247/integration/"
 alias cmsoutbound="cmsint && cd feeds/outbound/"
 alias cmsinbound="cmsint && cd feeds/inbound/"
-alias cmsdbupdate="cmsdb && cmsimport"
 alias cmsstatic="cd ~/git/cms/src/247/staticfiles"
 alias cmslessc="cmsstatic && less-watch-compiler cms/less cms/css cms-new-look.less"
 alias cmsrmmigs="cmspath; gitmig | xargs rm"
-alias cmsserver="cmskill; cmsenv && python manage.py runserver --insecure"
-alias cmsshell="cmsenv && python manage.py shell_plus --quiet"
+alias cmsserver="cmskill; devenv cms && python manage.py runserver --insecure"
+alias cmsshell="devenv cms && python manage.py shell_plus --quiet"
 alias cmsupdate="cmspath && git pull && cmsmake && cmsmigrate"
-alias cmstest="cmsenv && python manage.py"
+alias cmstest="devenv cms && python manage.py"
 alias cmslocalpy="cmspath && vim settings/local.py"
-alias cmsmongo="mongod --bind_ip 172.17.0.1"
-
-#CMS2
-alias cms2make="cms2env && python manage.py makemigrations --noinput"
-alias cms2migrate=" cms2env && python manage.py migrate --noinput"
-alias cms2update="cms2path && git pull && cms2make && cms2migrate"
-alias cms2path="cd ~/git/cms/dev/247 && pyclean"
-alias cms2rmmigs="cms2path; gitmig | xargs rm"
-alias cms2int="cms2path && cd apps247/integration/"
-alias cms2outbound="cms2int && cd feeds/outbound/"
-alias cms2inbound="cms2int && cd feeds/inbound/"
-
+alias cmsmongo="mongod --bind_ip 172.17.0.1 &"
+alias cmsredis="redis-server --bind 172.17.0.1 &"
 
 # Lead Manager
 alias lead-manager="cmspath && cd js_apps/cms/lead_manager/"
@@ -103,34 +131,139 @@ alias lead-manager-js-compile="lead-manager && npm run watch"
 alias lead-manager-less-watch-compile="lead-manager-less-compile && less-watch-compiler --config=/home/jorenza/.config/less-watch-compiler.config.json"
 alias lead-manager-less-compile="cmsstatic && cd cms && lessc less/style-2/lead-manager/lead-manager.less css/lead_manager/lead-manager.css && echo 'Initial compile: Complete.'"
 
+# Dockers
+alias startcentdocker="docker start dev-centerprise-nginx dev-centerprise-sentry dev-centerprise-cms dev-centerprise-cms-login"
+alias startcmsdocker="docker start dev-cms-mailhog dev-cms-redis-server"
+alias restartdockers="\/etc\/init\.d\/docker restart"
+alias stopdockers="\/etc\/init\.d\/docker stop"
+
 # Centerprise CMS
 alias centpath="cd ~/git/centerprise/src/"
-alias centactivate="source /home/jorenza/git/centerprise/cent-env/bin/activate && centpath"
-alias centenvrestart="deactivate; stopdockers && centenv"
-alias centcmsbuild="centenv && ./build.py --clean cms-login && startcmsdocker"
-alias centcmsrebuild="centenvrestart && ./build.py --use-cache cms-login && startcmsdocker"
+alias centactivate="pyenv activate cent-env && centpath"
+alias centcmsbuild="devenv cent && ./build.py --clean cms-login"
+alias centcmsrebuild="restartdockers && devenv cent && ./build.py --use-cache cms-login && startcmsdocker"
+alias centcmsstart="centcmsbuild && centcmsattach"
+alias centcmsrestart="restartdockers && devenv cent && startcentdocker && centcmsattach"
+alias centcmsattach="docker attach dev-centerprise-cms"
 
-alias centcmsstart="centcmsbuild && docker attach dev-centerprise-cms"
-alias centcmsrestart="centenvrestart && startcentdocker && startcmsdocker && docker attach dev-centerprise-cms"
-alias centcmsopen="docker start dev-centerprise-cms && docker attach dev-centerprise-cms"
+# Repo updates
+alias leasingportalupdate="backsassupdate && gogogadgetupdate && jsonbornupdate && portalupdate"
+alias portalupdate="portalpath && git pull"
+alias jsonbornupdate="jsonbornpath && git pull"
+alias backsassupdate="backsasspath && git pull"
+alias gogogadgetupdate="gogogadgetpath && git pull"
 
-# Dockers
-alias startcentdocker="docker start dev-centerprise-nginx dev-centerprise-sentry dev-centerprise-cms dev-centerprise-cms-login dev-cms-mailhog dev-cms-redis-server"
-alias startcmsdocker="docker start dev-cms-mailhog dev-cms-redis-server"
-alias stopdockers="\/etc\/init\.d\/docker restart"
+# Repo paths
+alias portalpath="centpath && cd cms-images/cms-leasing-portal"
+alias jsonbornpath="cd ~/git/centerprise/json-born"
+alias backsasspath="cd ~/git/centerprise/back-sass"
+alias gogogadgetpath="cd ~/git/centerprise/go-go-gadget"
 
-# SecureApplications
-alias venvsec=". ~/git/secureapps/secure-apps-env/bin/activate"
-alias migratesec="python ~/secureapps/manage.py migrate --noinput"
-alias runsec="python ~/secureapps/manage.py runserver 0.0.0.0:8080 --insecure"
-alias celerysec="cd ~/git/secureapps/src/ && celery -A celery_init worker --loglevel=debug"
+# Database Reimports
+alias portaldbupdate="centpath && dropdb leasingportal && createdb leasingportal && cat cms-images/cms-leasing-portal/sql/createdb.sql | psql -f - leasingportal"
 
-# Spider
-alias spiderenv=". ~/git/spider/spider-env/bin/activate && spiderpath"
-alias spiderpath="cd ~/git/spider/src/apts247"
-alias spiderrun="spiderclean && spiderenv && scrapy runspider apts247/spiders/247_spider.py && spiderls && spiderpath"
-alias spiderclean="cd ~/git/spider/src/apts247/apts247/staticfiles && rm -rf *"
-alias spiderls="cd ~/git/spider/src/apts247/apts247/staticfiles && find . -name '*.html' | sort"
+# Start Servers
+alias startserver='f(){ unset "$@" && source ~/.bash_aliases && clear && "$@"; unset -f f; }; f'
+alias startirlurl="startserver irlurlserver"
+alias startportal="startserver portalserver"
+alias startportalapi="startserver apiconvergenceserver"
+alias startnginxwebsiteruntime="startserver nginxwebsiteruntimeserver"
+
+# Build servers
+alias apiconvergencebuild="go build github.com/Apartments24-7/centerprise/cms-images/api-convergence"
+alias irlserverbuild="go build github.com/Apartments24-7/centerprise/local-only-images/irl-urls"
+alias portalbuild="go build github.com/Apartments24-7/centerprise/cms-images/cms-leasing-portal"
+alias nginxwebsiteruntimebuild="go build github.com/Apartments24-7/centerprise/misc-images/nginx-website-runtime"
+
+# Rebuild servers
+alias apiconvergencerebuild="rm api-convergence; go build -a github.com/Apartments24-7/centerprise/cms-images/api-convergence"
+alias irlserverrebuild="rm irl-urls; go build -a github.com/Apartments24-7/centerprise/local-only-images/irl-urls"
+alias portalrebuild="rm cms-leasing-portal; go build -a github.com/Apartments24-7/centerprise/cms-images/cms-leasing-portal"
+alias nginxwebsiteruntimerebuild="rm nginx-website-runtime; go build -a github.com/Apartments24-7/centerprise/misc-images/nginx-website-runtime"
+
+# Run servers
+function irlurlserver() {
+    devenv cent;
+    local IRLURLPORT=3001;
+    local CENTSRC="/home/jorenza/go/src/github.com/Apartments24-7/centerprise";
+    eval killserver $IRLURLPORT;
+    eval irlserverbuild;
+    VERBOSE=1 ./irl-urls \
+        --irl-domain 247.freedomfloorplans.apartments \
+        --git-data-dir "$CENTSRC/test" \
+        --listen-address :$IRLURLPORT \
+        --render base
+        # --irl-domain 247.mediamanager.apartments \
+    }
+
+function portalserver() {
+    devenv cent;
+    local APICONVERGENCEPORT=7000;
+    local CMSPORT=8000;
+    local PORTALPORT=8080;
+    local CENTSRC="/home/jorenza/go/src/github.com/Apartments24-7/centerprise";
+    eval killserver $PORTALPORT;
+    eval portalbuild;
+
+        # --access-log-enabled \
+    VERBOSE=1 ./cms-leasing-portal \
+        -k "dev" \
+        --api-convergence-url "http://127.0.0.1:$APICONVERGENCEPORT/api-convergence/" \
+        --aptexx-v2-api-token 1ISHSZPTB3C9XE7Q \
+        --aptexx-v2-callback-url https://fees1.apts247.us \
+        --aptexx-v2-payment-domain clientsandbox.aptx.cm \
+        --cms-247-host "dev.viaryland.com:$CMSPORT" \
+        --cms-leasing-host "247.apts247.us:$PORTALPORT" \
+        --disable-json-born-cache \
+        --disable-kms \
+        --disable-manager-email \
+        --disable-template-updates \
+        --disable-tls-cms \
+        --disable-tls-leasing-portal \
+        --email-port "1025" \
+        --email-server "172.17.0.1" \
+        --git-data-dir "$CENTSRC/test" \
+        --portal-leasing-host "portal.apts247.us:$PORTALPORT" \
+        --view-leasing-host "dev.viaryland.com"
+    }
+
+function apiconvergenceserver() {
+    devenv cent;
+    local APICONVERGENCEPORT=7000
+    eval killserver $APICONVERGENCEPORT;
+    eval apiconvergencebuild;
+    VERBOSE=1 ./api-convergence \
+        -k dev \
+        --listen-address 127.0.0.1:$APICONVERGENCEPORT
+    }
+
+function nginxwebsiteruntimeserver() {
+    devenv cent;
+    local APICONVERGENCEPORT=7000
+    eval nginxwebsiteruntimebuild;
+    VERBOSE=1  ./nginx-website-runtime \
+        -k dev \
+        --api-convergence-url http://127.0.0.1:$APICONVERGENCEPORT/api-convergence/ \
+        --spider-domains localsite.viaryland.com,
+    }
+
+# Kill servers
+function killserver() {
+    if [[ ! -z "$1" ]]; then
+        local KILLCMD=$(lsof -i :$1 | grep $USER | awk '{ print $2 }')
+        if [[ $KILLCMD ]]; then
+            kill -9 $KILLCMD
+        fi
+    fi
+}
+
+# Test portal
+function testportal() {
+    eval portalpath;
+    local CENTSRC="/home/jorenza/go/src/github.com/Apartments24-7/centerprise";
+    KEY_PATH=$CENTSRC/dev/ GIT_DATA_DIR=$CENTSRC/test/ go test -v -coverprofile cover.out .
+    go tool cover -html=cover.out -o cover.html
+}
 
 # Celery Debugger
 alias rdb="telnet localhost 6900"
@@ -145,7 +278,9 @@ fi
 
 alias pyclean='find . -type f -name "*.py[co]" -exec rm -f \{\} \;'
 alias speedtest="curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python -"
-alias whatsmyip="dig +short myip.opendns.com @resolver1.opendns.com"
+alias whatsmyextip="dig +short myip.opendns.com @resolver1.opendns.com | awk '{print \"external: \"\$1}'"
+alias whatsmylocalip="ifconfig | grep 'inet ' | awk '{print \"local: \"\$2}' | cut -f1 -d'/'"
+alias whatsmyip="whatsmylocalip && whatsmyextip"
 alias xclip-grab="xclip -i -selection clipboard"
 
 # Git
@@ -198,26 +333,7 @@ alias gsa='f(){ git stash apply stash@{"$@"};  unset -f f; }; f'
 
 # Trello
 alias trellopath="cd ~/git/trello/src/"
-alias trelloenv="trellopath && source ../trello-env/bin/activate"
 
-# Sites
-function sitesenv(){
-    if [ -z $PYENV_VERSION ]; then
-        eval sitesactivate;
-    else
-        eval sitespath;
-    fi
-    clear;
-}
-function sitesupdate(){
-    APPNAME="$1";
-    eval sitesmake $APPNAME;
-    eval sitesmigrate $APPNAME;
-}
-alias sitespath="cd ~/git/Django-Projects/src/sites"
-alias sitesactivate="pyenv activate sites-env && sitespath"
-alias sitesserver="sitesenv && python manage.py runserver 8081"
-alias sitesmigrate="sitesenv && python manage.py migrate"
-alias sitesmake="sitesenv && python manage.py makemigrations"
-alias siteskill="lsof -i:8080 | grep [p]ython | awk '{print \"kill \"\$2}' | sh"
-alias sitesshell="sitesenv && python manage.py shell_plus"
+# Aptcast
+alias aptcastpath="cd ~/git/AptcastResident_v2/"
+alias aptcastfreshinstall="nvm install-latest-npm && npm i -g ionic cordova cordova-res"

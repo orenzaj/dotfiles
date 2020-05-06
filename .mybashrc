@@ -3,7 +3,7 @@
 ######################################################################
 # Main
 ######################################################################
-export PATH='/home/jorenza/bin:/home/jorenza/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/usr/local/go/bin:/home/jorenza/go/bin:/home/jorenza/.pyenv/bin:/home/jorenza/.cargo/bin'
+export PATH='/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/usr/local/go/bin:/home/jorenza/go/bin:/home/jorenza/.pyenv/bin:/home/jorenza/.cargo/bin:/home/jorenza/bin:/home/jorenza/.local/bin'
 
 
 ######################################################################
@@ -64,12 +64,14 @@ export GIT_PS1_SHOWDIRTYSTATE=1
 [ -f ~/.fzf.bash  ] && source ~/.fzf.bash
 
 # RG PATH
+# export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow -g "!{.git,node_modules}/*"'
+# export FZF_DEFAULT_COMMAND="fd --type file --follow --hidden --color=always --exclude .git"
 export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow -g "!{.git,node_modules}/*" 2> /dev/null'
-
-# export FZF_DEFAULT_COMMAND="fd --type file --follow --hidden --color=always --exclude .git . $HOME"
+export FZF_COMPLETION_OPTS="--preview '(bat --color=always {} || cat {} || tree -C {}) 2> /dev/null | head -200'"
 export FZF_DEFAULT_OPTS='--ansi --height 40% --layout=reverse --border'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-export FZF_ALT_C_COMMAND="fd -t d . $HOME"
+export FZF_CTRL_T_OPTS="$FZF_COMPLETION_OPTS"
+export FZF_ALT_C_COMMAND="fd -t d"
 
 bind -x '"\C-p": vim $(fzf);'
 
@@ -140,6 +142,6 @@ if [ -f ~/.git-completion.bash ]; then . ~/.git-completion.bash ; fi
 if [ -f ~/.git-prompt.sh ]; then . ~/.git-prompt.sh ; fi
 
 if [ -z "$TMUX" ]; then
-  tmux new-session -A -s parallels
+  tmux new-session -A -s cms
 fi
 ######################

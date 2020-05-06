@@ -1,12 +1,11 @@
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Vim Plug auto installer
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Vim Plug autoinstaller """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 if empty(glob('~/.vim/autoload/plug.vim'))
     silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
-                \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-    autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+                \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim augroup auto_src_vimrc
+        autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+    augroup END
 endif
-
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " VimPlug Settings
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -16,20 +15,21 @@ call plug#begin('~/.vim/plugged')
     Plug 'aldantas/vim-custom-surround'
     Plug 'chrisbra/Colorizer'
     Plug 'dense-analysis/ale'
-    Plug 'dracula/vim', { 'as': 'dracula' }
+    Plug 'dracula/vim', { 'as': 'dracula'}
     Plug 'dyng/ctrlsf.vim'
-    Plug 'edkolev/tmuxline.vim'
     Plug 'flrnd/candid.vim'
+    Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+    Plug 'itchyny/lightline.vim'
+    Plug 'jesseleite/vim-agriculture'
     Plug 'jiangmiao/auto-pairs'
     Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
     Plug 'junegunn/fzf.vim'
     Plug 'mattn/emmet-vim'
+    Plug 'maximbaz/lightline-ale'
     Plug 'roxma/vim-tmux-clipboard'
     Plug 'roxma/nvim-yarp'
     Plug 'roxma/vim-hug-neovim-rpc'
     Plug 'sheerun/vim-polyglot'
-    Plug 'Shougo/deoplete.nvim'
-    Plug 'Shougo/unite.vim'
     Plug 'simeji/winresizer'
     Plug 'terryma/vim-multiple-cursors'
     Plug 'tmhedberg/matchit'
@@ -40,20 +40,19 @@ call plug#begin('~/.vim/plugged')
     Plug 'tpope/vim-obsession'
     Plug 'tpope/vim-repeat'
     Plug 'tpope/vim-vinegar'
-    Plug 'vim-airline/vim-airline'
-    Plug 'vim-airline/vim-airline-themes'
     Plug 'Yggdroot/indentLine'
+    Plug 'ryanoasis/vim-devicons'
 call plug#end()
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Misc
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" set nohidden
+set nohidden
 set nocompatible
-set noshowmode
 set noswapfile
 set encoding=utf-8
+scriptencoding utf-8
 filetype plugin on
 
 
@@ -76,10 +75,11 @@ set smartcase
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Tabs
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+set expandtab
 set tabstop=4
 set softtabstop=4
 set shiftwidth=4
-set expandtab
+set autoindent
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Bells
@@ -104,7 +104,7 @@ highlight Normal ctermbg=None
 " True Colors
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 if &term =~# '^screen'
-    let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+    let &t_8f = '\<Esc>[38;2;%lu;%lu;%lum'
     let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
 endif
 
@@ -112,8 +112,8 @@ endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Leaders
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let mapleader=";"
-let g:mapleader=";"
+let mapleader=';'
+let g:mapleader=';'
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -132,12 +132,6 @@ noremap <C-=> <C-W>=
 cnoremap <C-A> <Home>
 cnoremap <C-E> <End>
 cnoremap <C-K> <C-U>
-
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Delete trailing white space
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-autocmd BufWritePre * :%s/\s\+$//e
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -168,6 +162,7 @@ vmap <Leader>s <Plug>CtrlSFVwordPath <CR>
 " Hide search highlights, location list, quickfix list
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 noremap <silent> <leader><esc> :noh <bar> lcl <bar> ccl<cr>
+autocmd QuitPre * if empty(&bt) | lclose | endif
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -188,45 +183,64 @@ nnoremap K i<CR><Esc>
 map q <Nop>
 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Tmuxline Settings
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:tmuxline_status_justify = 'centre'
-" let g:tmuxline_theme = 'airline'
-" let g:tmuxline_preset = 'crosshair'
-" let g:tmuxline_preset = {
-"             \'a'    : '#S',
-"             \'c'    : '#(whoami)',
-"             \'win'  : ['#I', '#W'],
-"             \'cwin'  : ['#I', '#W'],
-"             \'x'    : '#(date)',
-"             \'y'    : ['%r', '%a', '%Y'],
-"             \'z'    : '#H',
-" }
-let g:tmuxline_separators = {
-            \ 'left' : '',
-            \ 'left_alt': '⮀',
-            \ 'right' : '',
-            \ 'right_alt' : '⮂',
-            \ 'space' : ' '}
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Lightline Settings (statusline)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:lightline = {
+            \ 'colorscheme': 'dracula',
+            \ 'active':  {
+            \   'left': [ [ 'mode, paste' ],
+            \             [ 'gitbranch', 'readonly', 'filename' ] ],
+            \   'right': [ ['lineinfo'],
+            \              ['percent'],
+            \              ['readonly', 'linter_warnings', 'linter_errors', 'linter_ok'] ]
+            \ },
+            \ 'component_function':  {
+            \   'gitbranch': 'fugitive#head',
+            \   'filename': 'LightlineFilename'
+            \ },
+            \ 'component_expand':  {
+            \   'linter_checking': 'lightline#ale#checking',
+            \   'linter_warnings': 'lightline#ale#warnings',
+            \   'linter_errors': 'lightline#ale#errors',
+            \   'linter_ok': 'lightline#ale#ok',
+            \ },
+            \ 'component_type':  {
+            \   'linter_checking': 'left',
+            \   'linter_warnings': 'warning',
+            \   'linter_errors': 'error',
+            \   'linter_ok': 'left',
+            \ }
+            \}
 
+function! MyFiletype()
+    return winwidth(0) > 70 ? (strlen(&filetype) ? &filetype . ' ' . WebDevIconsGetFileTypeSymbol() : 'no ft') : ''
+endfunction
+
+function! MyFileformat()
+    return winwidth(0) > 70 ? (&fileformat . ' ' . WebDevIconsGetFileFormatSymbol()) : ''
+endfunction
+
+let g:lightline#ale#indicator_checking = "⧖"
+let g:lightline#ale#indicator_warnings = "◆ "
+let g:lightline#ale#indicator_errors = "✗ "
+let g:lightline#ale#indicator_ok = "✓ "
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Airline Settings (statusline)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-set laststatus=2
-let g:airline_powerline_fonts = 1
-let g:airline_theme='dracula'
-let g:airline#extensions#tmuxline#enabled = 0
-let g:airline#extensions#tmuxline#status_justify = "centre"
-" let airline#extensions#tmuxline#color_template = 'visual'
-" let airline#extensions#tmuxline#snapshot_file = "/home/jorenza/.tmuxline.conf"
-
+" Dev Icons settings
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:webdevicons_enable = 1
+let g:webdevicons_enable_vimfiler = 1
+let g:webdevicons_enable_unite = 1
+let g:DevIconsEnableFoldersOpenClose = 1 " Enable open and close folder glyph flags.
+let g:WebDevIconsUnicodeDecorateFolderNodes = 1 " Enable folder glyph flag.
+let g:WebDevIconsUnicodeDecorateFolderNodesDefaultSymbol = '' " Disable folder icons.
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Django Testing
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 nnoremap <silent> <leader>t :exe "!tmux send -t 1 'execfile(\"test/%\")' Enter"<CR><C-L>
+nnoremap <silent> <leader>T :exe "!tmux send -t 1 'execfile(\"test/utils.py\")' Enter"<CR><C-L>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Autopairs Settings
@@ -241,7 +255,7 @@ set relativenumber
 noremap <leader>n :call ToggleNumber()<cr>
 function! ToggleNumber()
     IndentLinesToggle
-	GitGutterToggle
+    GitGutterToggle
     set number!
     set relativenumber!
 endfunction
@@ -251,7 +265,8 @@ endfunction
 " Folding
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set foldmethod=indent
-set foldlevel=1
+set foldlevel=3
+set foldlevelstart=99
 nnoremap <space> za
 
 
@@ -272,18 +287,24 @@ nnoremap <leader>w :w!<cr>
 " RipGrep settings
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 if executable('rg')
-	set grepprg=rg\ --vimgrep
-	set grepformat=%f:%l:%c:%m
+    set grepprg='rg\
+                \ --vimgrep\
+                \ --color=always\
+                \ --glob "!{.git,node_modules}/*"\
+                \ --glob "!*.[style.css\|.md\|.log\|min.js]"'
+    set grepformat=%f:%l:%c:%m
 endif
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Rooter settings
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:rooter_change_directory_for_non_project_files = 'current'
-" let g:rooter_use_lcd = 1
-" let g:rooter_manual_only = 1
-
+let g:rooter_resolve_links = 1
+let g:rooter_change_directory_for_non_project_files = ''
+let g:rooter_use_lcd = 1
+let g:rooter_manual_only = 1
+let g:rooter_patterns = ['Rakefile', '.git', '.git/']
+map <leader>cr :Rooter <CR>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " fzf settings
@@ -291,88 +312,91 @@ let g:rooter_change_directory_for_non_project_files = 'current'
 " ;s will search for words
 " ;f will search for files
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-function! s:find_git_root()
-  return system('git rev-parse --show-toplevel 2> /dev/null')[:-2]
-endfunction
-
 command! -bang -nargs=* Rg
-  \ call fzf#vim#grep(
-  \ 'rg
-  \ --column
-  \ --glob "*.{py,html}"
-  \ --glob "!{.git,node_modules,.min.js}/*"
-  \ --hidden
-  \ --smart-case
-  \ --line-number
-  \ --no-heading
-  \ --color=always '.shellescape(<q-args>), 1,
-  \   <bang>0 ? fzf#vim#with_preview({'options': '--delimiter : --nth 4..', 'dir': FindRootDirectory()}, 'up:60%')
-  \           : fzf#vim#with_preview({'options': '--delimiter : --nth 4..', 'dir': FindRootDirectory()}, 'right:50%:hidden', '?'),
-  \   <bang>0)
-
-command! -bang -nargs=? -complete=dir Files
-  \ call fzf#vim#files(<q-args>, fzf#vim#with_preview(), <bang>0)
+            \ call fzf#vim#grep(
+            \ 'rg
+            \ --column
+            \ --glob "*.{py,html}"
+            \ --glob "!{.git,node_modules}/*"
+            \ --glob "!*[style.css\|.md\|.log\|{min,compiled}.js]"
+            \ --hidden
+            \ --files
+            \ --smart-case
+            \ --line-number
+            \ --no-heading
+            \ --color=always '.shellescape(expand("<cword>")), 1,
+            \ fzf#vim#with_preview(),
+            \ <bang>0)
+            \   <bang>0 ? fzf#vim#with_preview({'options': '--delimiter : --nth 4..'}, 'up:60%')
+            \           : fzf#vim#with_preview({'options': '--delimiter : --nth 4..'}, 'right:50%:hidden', '?'),
+            \   <bang>0)
 
 command! -bang Buffers
-  \ call fzf#vim#buffers({'up': '30%', 'options': '--reverse --margin 3%,15%'}, <bang>0)
+            \ call fzf#vim#buffers({'up': '30%', 'options': '--reverse --margin 3%,15%'}, <bang>0)
 
+" Files + devicons
+function! Fzf_files_with_dev_icons()
+    let l:fzf_files_options = '--ansi --preview "bat --color always --style numbers {2..} | head -'.&lines.'"'
+    function! s:edit_devicon_prepended_file(item)
+        let l:file_path = a:item[4:-1]
+        execute 'silent e' l:file_path
+    endfunction
+    call fzf#run({
+                \ 'source': 'rg --column --hidden --files --line-number --no-heading --color=always | devicon-lookup',
+                \ 'sink': function('s:edit_devicon_prepended_file'),
+                \ 'options': '-m ' . l:fzf_files_options,
+                \ 'down': '40%' })
+endfunction
 
-command! ProjectFiles execute 'Files' FindRootDirectory()
-command! ColorTheme call fzf#run({
-\   'source':
-\     map(split(globpath(&rtp, "colors/*.vim"), "\n"),
-\         "substitute(fnamemodify(v:val, ':t'), '\\..\\{-}$', '', '')"),
-\   'sink':    'colo',
-\   'options': '+m',
-\   'left':    30
-\ })<CR>
-nmap <Leader>a :Rg <C-R><C-W><CR>
-nmap <Leader>b :Buffers <cr>
-nmap <Leader>c :ColorTheme <cr>
-nmap <Leader>f :ProjectFiles<cr>
-nmap <Leader>s :Rg <cr>
+" ;f will search files with DevIcons
+" nmap <Leader>f :call Fzf_files_with_dev_icons($FZF_DEFAULT_COMMAND)<CR> " :Files
+nmap <Leader>f :call Fzf_files_with_dev_icons()<CR> " :Files
+
+" ;s will search for words at root level /
+nmap <Leader>s <Plug>RgRawSearch<CR>
+
+" ;a will search for the content in the project folder
+vmap <Leader>a <Plug>RgRawVisualSelection<CR>
+nmap <Leader>a <Plug>RgRawWordUnderCursor<CR>
+
+" ;o will open the buffers
+nmap <Leader>o :Buffers <cr>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Brian Shenanigans (gf, paths)
+" Brian Shenanigans (gf)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 nmap gf :BrianOpenFile<cr>
 nmap <Leader>p :call BrianPathList()<cr>
 
 command! BrianOpenFile call BrianOpenFile()
 function! BrianOpenFile()
-try
-	let g:BrianOpenFileName = matchstr(expand("<cfile>"), ".*")
-    echo "1"
-    echo g:BrianOpenFileName
-	execute ':find ' . g:BrianOpenFileName
-catch /.*/
-	try
-		let g:BrianOpenFileName = expand("<cfile>") . ".js"
-        echo "2"
-        echo g:BrianOpenFileName
-		execute ':find ' . g:BrianOpenFileName
-	catch /.*/
-		try
-			let g:BrianOpenFileName = tr(expand("<cfile>"), ".", "/") . ".py"
-            echo "3"
-            echo g:BrianOpenFileName
-			execute ':find ' . g:BrianOpenFileName
-		catch /.*/
-			try
-				let g:BrianOpenFileName = matchstr(expand("<cfile>"), "[^/].*")
-                echo "4"
-                echo g:BrianOpenFileName
-				" execute ':find ' . g:BrianOpenFileName
-			catch /.*/
-			endtry
-		endtry
-	endtry
-endtry
+    try
+        let g:BrianOpenFileName = matchstr(expand('<cfile>'), '.*')
+        execute ':find ' . g:BrianOpenFileName
+    catch /.*/
+        try
+            let g:BrianOpenFileName = expand('<cfile>') . '.js'
+            execute ':find ' . g:BrianOpenFileName
+        catch /.*/
+            try
+                let g:BrianOpenFileName = tr(expand('<cfile>'), '.', '/') . '.py'
+                execute ':find ' . g:BrianOpenFileName
+            catch /.*/
+                try
+                    let g:BrianOpenFileName = matchstr(expand('<cfile>'), '[^/].*')
+                    execute ':find ' . g:BrianOpenFileName
+                catch /.*/
+                endtry
+            endtry
+        endtry
+    endtry
 endfunction
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Path settings
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+set path+=/home/jorenza/git/centerprise
+set path+=/home/jorenza/go/src/github.com/Apartments24-7/centerprise
 set path+=/home/jorenza/git/cms/src/247/apps247
 set path+=/home/jorenza/git/cms/src/247/templates_backend
 set path+=/home/jorenza/git/cms/src/247/staticfiles
@@ -382,12 +406,23 @@ set path+=/home/jorenza/git/cms/src/247/staticfiles
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let g:user_emmet_leader_key='<Leader>'
 let g:user_emmet_install_global = 1
-autocmd FileType html,css EmmetInstall
+augroup emmet_filetypes
+    autocmd!
+    autocmd FileType html,css EmmetInstall
+augroup END
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Vim Vinegar settings
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Hide hidden files ('gh' to toggle)
+" let g:netrw_list_hide = '\(^\|\s\s\)\zs\.\S\+\'
+
+" Hide .pyc files
 let g:netrw_list_hide='.*\.pyc$'
+
+" Fix duplicates showing
+let g:netrw_fastbrowse=2
+
 augroup netrw_keychange
     autocmd!
     autocmd filetype defx call NetrwMapping()
@@ -402,54 +437,57 @@ endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 nmap <leader>h :ColorHighlight<CR>
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Deoplete settings
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:deoplete#enable_at_startup = 1
-call deoplete#custom#option('sources', {'_': ['ale', ]})
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Ale settings
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:airline#extensions#ale#enabled = 1
 let g:ale_open_list = 1
 
 " Linters
 let g:ale_lint_on_enter = 1
 let g:ale_lint_on_save = 1
 
+" Write this in your vimrc file
+let g:ale_lint_on_text_changed = 'never'
+
 " Fixers
 let g:ale_fixers = {
-            \'python': ['add_blank_lines_for_python_control_statements',
-                        \'autopep8', 'black', 'isort',
-                        \'reorder-python-imports', 'yapf'],
-            \'javascript': ['prettier', 'eslint'],
-            \'*': ['remove_trailing_lines', 'trim_whitespace']
-\}
+            \ 'python': ['autopep8', 'reorder-python-imports'],
+            \ 'javascript': ['prettier', 'eslint'],
+            \ '*': ['remove_trailing_lines', 'trim_whitespace']
+            \}
+let b:ale_python_flake8_options = '--max-line-length=100 --ignore=E722,E226,W503'
+let b:ale_python_autopep8_options = '--max-line-length=100 --ignore=E722,E226,W503'
 let g:ale_fix_on_save = 0
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Custom Surround setting
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let lf = '<C-v><CR>'
-let vimCommentStart = repeat('"', 70) . lf . '"\ '
-let vimCommentEnd = lf . repeat('"', 70)
-let bashCommentStart = repeat('#', 70) . lf . '#\ '
-let bashCommentEnd = lf . repeat('#', 70)
-let ppStart = lf . 'from\ pprint\ import\ pprint' . lf . 'pprint('
-let ppEnd = ')' . lf
-let pdb =  'import\ pdb;\ pdb.set_trace()' . lf
-let pdbEnd = ppEnd . pdb
 
-call customsurround#map('<Leader>pp', ppStart, ppEnd)
-call customsurround#map('<Leader>pdb', ppStart, pdbEnd)
-call customsurround#map('<Leader>vc', vimCommentStart, vimCommentEnd)
-call customsurround#map('<Leader>bc', bashCommentStart, bashCommentEnd)
-call customsurround#map('<Leader>cl', 'console.log({\ ', '\ });')
-call customsurround#map('<Leader>ch', '\%V')
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Go Syntax Settings
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:go_highlight_function_parameters = 1
+let g:go_highlight_generate_tags = 1
+let g:go_highlight_build_constraints = 1
+let g:go_highlight_space_tab_error = 1
+let g:go_highlight_types = 1
+let g:go_highlight_fields = 1
+let g:go_highlight_extra_types = 1
+let g:go_highlight_chan_whitespace_error = 1
+let g:go_highlight_operators = 1
+let g:go_highlight_array_whitespace_error = 1
+let g:go_highlight_function_calls = 1
+let g:go_highlight_functions = 1
+let g:go_highlight_string_spellcheck = 1
+let g:go_highlight_format_strings = 1
+let g:go_highlight_variable_declarations = 1
+let g:go_highlight_diagnostic_errors = 1
+let g:go_highlight_diagnostic_warnings = 1
+let g:go_highlight_variable_assignments = 1
+let g:go_doc_keywordprg_enabled = 0
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Python Syntax Settings
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let python_highlight_all = 1
-au FileType python syn keyword pythonDecorator True None False self
+augroup python_filetype
+    au FileType python syn keyword pythonDecorator True None False self
+augroup END
