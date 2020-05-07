@@ -140,6 +140,7 @@ if [ -f ~/.bash_prompt ]; then . ~/.bash_prompt ; fi
 # Git
 if [ -f ~/.git-completion.bash ]; then . ~/.git-completion.bash ; fi
 if [ -f ~/.git-prompt.sh ]; then . ~/.git-prompt.sh ; fi
+if [ -f ~/.git_aliases ]; then . ~/.git_aliases ; fi
 
 if [ -z "$TMUX" ]; then
   tmux new-session -A -s cms

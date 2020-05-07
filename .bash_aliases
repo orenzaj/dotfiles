@@ -89,8 +89,8 @@ function cmsreimportdb() {
     echo -e "Reinitialized.";
 
     echo -e "\nRemporting '$CMS_PSQL_DB' database using the following command:";
-    echo -e "$REIMPORT_CMD";
     echo -e "$REIMPORT_CMD | sh";
+    echo -e $REIMPORT_CMD | sh
     eval cmsupdate;
 }
 
@@ -268,7 +268,6 @@ function testportal() {
 # Celery Debugger
 alias rdb="telnet localhost 6900"
 
-# Misc
 # Disables the extra env variable printing.
 if [[ $(uname -s) == Linux  ]]; then
     alias ls='ls --group-directories-first --color=auto'
@@ -276,64 +275,10 @@ else
     alias ls='gls --group-directories-first --color=auto'
 fi
 
+# Misc
 alias pyclean='find . -type f -name "*.py[co]" -exec rm -f \{\} \;'
 alias speedtest="curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python -"
 alias whatsmyextip="dig +short myip.opendns.com @resolver1.opendns.com | awk '{print \"external: \"\$1}'"
 alias whatsmylocalip="ifconfig | grep 'inet ' | awk '{print \"local: \"\$2}' | cut -f1 -d'/'"
 alias whatsmyip="whatsmylocalip && whatsmyextip"
 alias xclip-grab="xclip -i -selection clipboard"
-
-# Git
-alias gs="git status -sb"
-alias gits="gs | grep '^M ' | awk '{print \$2}'"
-alias gitd="gs | grep -E \"D\\s\""
-
-# Untracked
-alias gitu="gs | grep '?? '"
-alias gitau="gitu | awk '{print \"git add \"\$2}' | sh"
-alias gitcou="gitu | awk '{print \"git checkout \-\- \"\$2}' | sh"
-alias gitrmu="gitu | awk '{print \"rm -rf \"\$2}' | sh"
-
-# Both Modified
-alias gitb="gs | grep \"AA\|MM\|UU\""
-alias gitab="gitb | awk '{print \"git add \"\$2}' | sh"
-alias gitrmb="gitb | awk '{print \"rm -rf \"\$2}' | sh"
-alias gitcob="gitb | awk '{print \"git checkout \"\$2}' | sh"
-
-# Modified
-alias gitm="gs | grep ' M '"
-alias gitam="gitm | awk '{print \"git add \"\$2}' | sh"
-alias gitcom="gitm | awk '{print \"git checkout \"\$2}' | sh"
-alias gitrmm="gitm | awk '{print \"rm \"\$2}' | sh"
-alias gitsm="gs | grep 'M ' | awk '{print \"git reset HEAD \"\$2}' | sh"
-
-# All
-alias gitaa="gs | grep -v \# | awk '{print \"git add \"\$2}' | sh"
-alias gitcoa="gs | grep -v \# | awk '{print \"git checkout \-\- \"\$2}' | sh"
-alias gitrma="gs | grep -v \# | awk '{print \"rm\"\$2}' | sh"
-alias gitrmd="gitd | awk '{print \"git rm \"\$2}' | sh"
-
-# Diffs
-alias gitds="git diff --staged"
-alias gitmig="gs | grep 'migrations' | awk '{print \$2}'"
-
-# Branches
-alias gb="git for-each-ref --sort=committerdate refs/heads/ --format='%(committerdate:short) %(refname:short)'"
-alias gcm="git checkout master"
-alias gcb="git checkout -b"
-
-# Push
-alias gpu="git push -u origin HEAD"
-alias gpb='f(){ gcb && gitam && git commit {"$@"} && gpu; unset -f f; }; f'
-
-# Stash
-alias gsl="git stash list"
-alias gss="git stash save"
-alias gsa='f(){ git stash apply stash@{"$@"};  unset -f f; }; f'
-
-# Trello
-alias trellopath="cd ~/git/trello/src/"
-
-# Aptcast
-alias aptcastpath="cd ~/git/AptcastResident_v2/"
-alias aptcastfreshinstall="nvm install-latest-npm && npm i -g ionic cordova cordova-res"
