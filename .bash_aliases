@@ -1,6 +1,6 @@
 function devenv() {
     # Usage: devenv <env_name> [options]
-    # Options: 
+    # Options:
     #   -a          Force to activate an environment (default)
     #   -d          Force to deactivate an environment
     #   -t          Force to toggle an environment
@@ -8,13 +8,13 @@ function devenv() {
         local CURRENV=$(python -c 'import sys; print(getattr(sys, "prefix", "").split("/")[-1])');
         if [[ -n $CURRENV ]]; then
             local DEACTIVATE=$(echo "$@" | grep -e '-d')
-            if [[ -n $DEACTIVATE ]]; then 
+            if [[ -n $DEACTIVATE ]]; then
                 source deactivate 2> /dev/null
-            else 
+            else
                 local TOGGLE=$(echo "$@" | grep -e '-t')
-                if [[ -n $TOGGLE ]]; then 
+                if [[ -n $TOGGLE ]]; then
                     source deactivate 2> /dev/null
-                fi 
+                fi
                 local ENVNAME=$(echo $1 | sed 's/-//' | awk -F 'env' '{print $1"-env"}');
                 if [[ $CURRENV != $ENVNAME ]]; then
                     pyenv activate $ENVNAME
@@ -94,6 +94,12 @@ function cmsreimportdb() {
     eval cmsupdate;
 }
 
+# function cmsimportbyssh() {
+# }
+
+# function cmsimportbylocaldb() {
+# }
+
 # Mongo
 alias mongothemelist="mongofiles -h 172.17.0.1 -d apts247_secureapps_themes --prefix=\$(basename \$PWD) --quiet list"
 alias mongothemedir="mongothemelist | awk '{print \"mkdir \"\$1}' | cut -d'/' -sf1 | sort -u | sh"
@@ -103,12 +109,13 @@ alias mongodesigndir="mongodesignlist | awk '{print \"mkdir \"\$2}' | cut -d'/' 
 alias mongogetalldesigns="mongodesigndir && mongodesignlist | awk '{print \"mongofiles -h 172.17.0.1 -d apts247_secureapps_designs --prefix=\$(basename \$PWD) get \"\$1}' | sh"
 
 # CMS
-alias cmscelery="devenv cms && celery -A celery_init worker --loglevel=debug"
+alias cmsenv="devenv cms -a"
+alias cmscelery="cmsenv && celery -A celery_init worker --loglevel=debug"
 alias cmsdb="restartdockers && cmsdbimporter"
 alias cmsdup='find . | grep migrations | grep "/[0-9]\+" | grep -v 'pyc' | sed -e "s/\([^/][^/][^/][^/]\)[^/]\+$/\1/" | sort | uniq -c | less'
 alias cmskill="lsof -i:8000 | grep [p]ython | awk '{print \"kill \"\$2}' | sh"
-alias cmsmake="devenv cms && python manage.py makemigrations --noinput"
-alias cmsmigrate="devenv cms && python manage.py migrate --noinput"
+alias cmsmake="cmsenv && python manage.py makemigrations --noinput"
+alias cmsmigrate="cmsenv && python manage.py migrate --noinput"
 alias cmspath="cd ~/git/cms/src/247 && pyclean"
 alias cmsint="cmspath && cd apps247/integration/"
 alias cmsoutbound="cmsint && cd feeds/outbound/"
@@ -116,10 +123,10 @@ alias cmsinbound="cmsint && cd feeds/inbound/"
 alias cmsstatic="cd ~/git/cms/src/247/staticfiles"
 alias cmslessc="cmsstatic && less-watch-compiler cms/less cms/css cms-new-look.less"
 alias cmsrmmigs="cmspath; gitmig | xargs rm"
-alias cmsserver="cmskill; devenv cms && python manage.py runserver --insecure"
-alias cmsshell="devenv cms && python manage.py shell_plus --quiet"
+alias cmsserver="cmskill; cmsenv && python manage.py runserver --insecure"
+alias cmsshell="cmsenv && python manage.py shell_plus --quiet"
 alias cmsupdate="cmspath && git pull && cmsmake && cmsmigrate"
-alias cmstest="devenv cms && python manage.py"
+alias cmstest="cmsenv && python manage.py"
 alias cmslocalpy="cmspath && vim settings/local.py"
 alias cmsmongo="mongod --bind_ip 172.17.0.1 &"
 alias cmsredis="redis-server --bind 172.17.0.1 &"
@@ -276,6 +283,7 @@ else
 fi
 
 # Misc
+alias dotfiles="cd ~/git/dotfiles"
 alias pyclean='find . -type f -name "*.py[co]" -exec rm -f \{\} \;'
 alias speedtest="curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python -"
 alias whatsmyextip="dig +short myip.opendns.com @resolver1.opendns.com | awk '{print \"external: \"\$1}'"

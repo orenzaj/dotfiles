@@ -434,11 +434,12 @@ let g:netrw_fastbrowse=2
 
 augroup netrw_keychange
     autocmd!
-    autocmd filetype defx call NetrwMapping()
+    autocmd filetype netrw call NetrwMapping()
 augroup END
+
 function! NetrwMapping()
     setl bufhidden=wipe
-    noremap <buffer>q :bd<CR>
+    noremap <buffer><leader><esc> :bd<CR>
 endfunction
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -461,13 +462,13 @@ let g:ale_lint_on_text_changed = 'never'
 
 " Fixers
 let g:ale_fixers = {
-            \ 'python': ['autopep8', 'reorder-python-imports'],
+            \ 'python': ['autopep8', 'isort'],
             \ 'javascript': ['prettier', 'eslint'],
             \ '*': ['remove_trailing_lines', 'trim_whitespace']
             \}
 let b:ale_python_flake8_options = '--max-line-length=100 --ignore=E722,E226,W503'
 let b:ale_python_autopep8_options = '--max-line-length=100 --ignore=E722,E226,W503'
-let g:ale_fix_on_save = 0
+let g:ale_fix_on_save = 1
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
