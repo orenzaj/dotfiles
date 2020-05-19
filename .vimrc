@@ -215,9 +215,9 @@ let g:tmuxline_separators = {
 set laststatus=2
 let g:airline_powerline_fonts = 1
 let g:airline_theme='dracula'
-let g:airline#extensions#tmuxline#enabled = 1
+let g:airline#extensions#tmuxline#enabled = 0
 let airline#extensions#tmuxline#color_template = 'visual'
-let airline#extensions#tmuxline#snapshot_file = "/home/jorenza/.tmuxline.conf"
+let airline#extensions#tmuxline#snapshot_file = "~/.tmuxline.conf"
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -360,8 +360,8 @@ endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Path settings
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-set path+=/home/jorenza/git/cms/src/247/apps247
-set path+=/home/jorenza/git/cms/src/247/templates_backend
+set path+=$HOME/git/cms/src/247/apps247
+set path+=$HOME/git/cms/src/247/templates_backend
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""

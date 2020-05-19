@@ -2,67 +2,31 @@
 
 # Functions
 function vim() {
-  if test $# -gt 0; then
-    env vim "$@"
-  elif test -f Session.vim; then
-    env vim -S
-  else
-    env vim -c Obsession
-  fi
-}
-
-function gb {
-    if [[ "$#" -ge 1 ]]; then
-        if echo "${1}"|grep '^[0-9]\+$' ; then
-            branch=$(echo -e "`git branch -a|grep -v HEAD|grep remote|sed "s/.*\/origin\///"|sort|head -n ${1}|tail -n 1`");
-            echo -e "\n"
-            git checkout $branch
-        else
-            echo -e  "`git branch -a|grep -v HEAD|grep remote|grep ${1}|sed "s/.*\/origin\///"|sort|awk '{printf("%3d: %s\n", NR, $0)}'`";
-            output=$(echo -e "`git branch -a|grep -v HEAD|grep remote|grep ${1}|wc -l`");
-            if [ "$output" -ge 1 ]; then
-                if [ "$#" -ge 2 ]; then
-                    branch=$(echo -e "`git branch -a|grep -v HEAD|grep remote|grep ${1}|sed "s/.*\/origin\///"|sort|head -n ${2}|tail -n 1`");
-                    echo -e "\n"
-                    git checkout $branch
-                else
-                    if [ "$output" -le 1 ]; then
-                        echo -e "\n"
-                        git checkout ${1}
-                    fi
-                fi
-            else
-                echo -e "git push origin origin:refs/heads/${1}";
-                git push origin origin:refs/heads/${1}
-                git checkout ${1}
-            fi
-        fi
+    if test $# -gt 0; then
+        env vim "$@"
+    elif test -f Session.vim; then
+        env vim -S
     else
-        echo "`git branch -a|grep -v HEAD|grep remote|sed "s/.*\/origin\///"|sort|awk '{printf("%3d: %s\n", NR, $0)}'`";
+        env vim -c Obsession
     fi
 }
 
 #### SOURCE FILES ####
-# Environment Variables
-if [ -f ~/.bash_env ]; then . ~/.bash_env ; fi
-
 # Aliases
 if [ -f ~/.bash_aliases ]; then . ~/.bash_aliases ; fi
-
-# Colors
-if [ -f ~/.bash_colors ]; then . ~/.bash_colors ; fi
 
 # Paths
 if [ -f ~/.bash_paths ]; then . ~/.bash_paths ; fi
 
+# Colors
+if [ -f ~/.bash_colors ]; then . ~/.bash_colors ; fi
+
+# Git
+if [ -f ~/.bash_git ]; then . ~/.bash_git ; fi
+
 # Prompt
 if [ -f ~/.bash_prompt ]; then . ~/.bash_prompt ; fi
 
-# Git
-if [ -f ~/.git-completion.bash ]; then . ~/.git-completion.bash ; fi
-if [ -f ~/.git-prompt.sh ]; then . ~/.git-prompt.sh ; fi
+# Environment Variables
+if [ -f ~/.bash_env ]; then . ~/.bash_env ; fi
 
-if [ -z "$TMUX" ]; then
-  tmux new-session -A -s work
-fi
-######################
