@@ -58,6 +58,10 @@ alias gsl="git stash list"
 alias gss="git stash save"
 alias gsa='f(){ git stash apply stash@{"$@"};  unset -f f; }; f'
 
+# Download Tar Files
+alias tardl='f(){ curl $1 | tar -xz -C /home/jorenza/downloads/; unset -f f; }; f'
+
+
 # Trello
 alias trellopath="cd ~/git/trello/src/"
 alias trelloenv="trellopath && source ../trello-env/bin/activate"
@@ -94,3 +98,6 @@ alias sitesmigrate="sitesenv && python manage.py migrate"
 alias sitesmake="sitesenv && python manage.py makemigrations"
 alias siteskill="lsof -i:8080 | grep [p]ython | awk '{print \"kill \"\$2}' | sh"
 alias sitesshell="sitesenv && python manage.py shell_plus"
+
+alias d64='f(){ echo -e $1 | base64 --decode; unset -f f; }; f'
+alias e64='f(){ echo -e $1 | base64 ; unset -f f; }; f'

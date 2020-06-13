@@ -67,12 +67,12 @@ gp(){
 # Second line
 ######################################################################
 sl(){
-    SYMBOL="➜"
+    SYMBOL=" →"
     echo -e "\r\n${INDIGO}${SYMBOL} ${WHITE} "
 }
 
 set_prompt() {
-    PS1="`ct``ve``cu``ch``wd``gp``sl`"
+    PS1="\r\n`ct``ve``cu``ch``wd``gp``sl`"
 }
 
 PROMPT_COMMAND=set_prompt

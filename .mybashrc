@@ -1,10 +1,10 @@
-#!/usr/bin/env bash
 
+#!/usr/bin/env bash
 ######################################################################
 # Main
 ######################################################################
-export PATH='/home/jorenza/bin:/home/jorenza/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/usr/local/go/bin:/home/jorenza/go/bin:/home/jorenza/.pyenv/bin:/home/jorenza/.cargo/bin:/home/jorenza/.pyenv/shims'
-
+export
+PATH='~/swift/swift-5.2.2-RELEASE-ubuntu18.04/usr/bin:/home/jorenza/bin:/home/jorenza/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/usr/local/go/bin:/home/jorenza/go/bin:/home/jorenza/.pyenv/bin:/home/jorenza/.cargo/bin:/home/jorenza/.pyenv/shims'
 
 ######################################################################
  # Functions
