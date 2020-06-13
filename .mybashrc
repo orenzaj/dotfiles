@@ -23,6 +23,7 @@ if [ -f ~/.bash_colors ]; then . ~/.bash_colors ; fi
 
 # Git
 if [ -f ~/.bash_git ]; then . ~/.bash_git ; fi
+if [ -f ~/.git_aliases ]; then . ~/.git_aliases ; fi
 
 # Prompt
 if [ -f ~/.bash_prompt ]; then . ~/.bash_prompt ; fi
@@ -30,3 +31,4 @@ if [ -f ~/.bash_prompt ]; then . ~/.bash_prompt ; fi
 # Environment Variables
 if [ -f ~/.bash_env ]; then . ~/.bash_env ; fi
 
+# Additional project aliases
