@@ -3,8 +3,7 @@
 ######################################################################
 # Main
 ######################################################################
-export
-PATH='~/swift/swift-5.2.2-RELEASE-ubuntu18.04/usr/bin:/home/jorenza/bin:/home/jorenza/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/usr/local/go/bin:/home/jorenza/go/bin:/home/jorenza/.pyenv/bin:/home/jorenza/.cargo/bin:/home/jorenza/.pyenv/shims'
+export PATH='/mnt/c/Windows/system32:/home/jorenza/swift/swift-5.2.2-RELEASE-ubuntu18.04/usr/bin:/home/jorenza/bin:/home/jorenza/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/usr/local/go/bin:/home/jorenza/go/bin:/home/jorenza/.pyenv/bin:/home/jorenza/.cargo/bin:/home/jorenza/.pyenv/shims'
 
 ######################################################################
  # Functions
@@ -76,7 +75,7 @@ bind -x '"\C-p": vim $(fzf);'
 ######################################################################
 # RIPGREP
 ######################################################################
-export RIPGREP_CONFIG_PATH=$HOME/.ripgreprc rg foo
+export RIPGREP_CONFIG_PATH=$HOME/.ripgreprc
 
 ######################################################################
 # NVM
@@ -99,16 +98,10 @@ export DISPLAY=:0
 ######################################################################
 # PYENV
 ######################################################################
-export PYENV_ROOT=/home/jorenza/.pyenv
+export PYENV_ROOT=$HOME/.pyenv
 
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
-
-######################################################################
-# NeoVim
-######################################################################
-ONI_NEOVIM_PATH=/home/jorenza/Downloads/neovim/nvim.appimage
-export ONI_NEOVIM_PATH
 
 ######################################################################
 # Go

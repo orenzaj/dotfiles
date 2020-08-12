@@ -99,5 +99,10 @@ alias sitesmake="sitesenv && python manage.py makemigrations"
 alias siteskill="lsof -i:8080 | grep [p]ython | awk '{print \"kill \"\$2}' | sh"
 alias sitesshell="sitesenv && python manage.py shell_plus"
 
+# Misc
 alias d64='f(){ echo -e $1 | base64 --decode; unset -f f; }; f'
 alias e64='f(){ echo -e $1 | base64 ; unset -f f; }; f'
+
+# Firebase Sites
+alias weddingpath="cd /home/jorenza/git/sites/wedding.orenza.us/"
+alias weddingserver="weddingpath && npm start"

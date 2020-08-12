@@ -65,9 +65,12 @@ set smartcase
 """"""""
 " Tabs "
 """"""""
-set tabstop=4
-set softtabstop=4
-set shiftwidth=4
+" set tabstop=4
+" set softtabstop=4
+" set shiftwidth=4
+set tabstop=2
+set softtabstop=2
+set shiftwidth=2
 set expandtab
 
 """""""""
@@ -334,6 +337,18 @@ augroup netrw_keychange
     autocmd!
     autocmd filetype netrw call NetrwMapping()
 augroup END
+
+
+" Drawer settings
+" let g:netrw_banner = 0
+" let g:netrw_liststyle = 3
+" let g:netrw_browse_split = 4
+" let g:netrw_altv = 1
+" let g:netrw_winsize = 15
+" augroup ProjectDrawer
+"   autocmd!
+"   autocmd VimEnter * :Vexplore
+" augroup END
 
 function! NetrwMapping()
     setl bufhidden=wipe
