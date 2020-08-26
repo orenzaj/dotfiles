@@ -1,0 +1,77 @@
+function devenv() {
+    # Usage: devenv <env_name> [options]
+    # Options:
+    #   -a          Force to activate an environment (default)
+    #   -d          Force to deactivate an environment
+    #   -t          Force to toggle an environment
+    if [[ -n $1 ]]; then
+        local CURRENV=$(python -c 'import sys; print(getattr(sys, "prefix", "").split("/")[-1])');
+        if [[ -n $CURRENV ]]; then
+            local DEACTIVATE=$(echo "$@" | grep -e '-d')
+            if [[ -n $DEACTIVATE ]]; then
+                source deactivate 2> /dev/null
+            else
+                local TOGGLE=$(echo "$@" | grep -e '-t')
+                if [[ -n $TOGGLE ]]; then
+                    source deactivate 2> /dev/null
+                fi
+                local ENVNAME=$(echo $1 | sed 's/-//' | awk -F 'env' '{print $1"-env"}');
+                if [[ $CURRENV != $ENVNAME ]]; then
+                    pyenv activate $ENVNAME
+                    local ENVPATH=$(echo $ENVNAME | sed 's/-env/path/');
+                    eval $ENVPATH
+                fi
+            fi
+        fi
+    fi
+}
+
+function cmsdb() {
+    echo -e "\nKilling the cms\n...";
+    eval cmskill;
+    echo -e "Killed.";
+
+    echo -e "\nReinitializing database 'cms'\n...";
+    dropdb cms;
+    createdb cms;
+    echo -e "Reinitialized.";
+
+    echo -e "\nFinding latest database dump in 'tomservo'";
+    echo -e "...\n";
+    local FINDDB_CMD="find /data/db -name \x24(ls -1St /data/db | head -1)";
+    local LATEST_DB_CMD="ssh tomservo '$FINDDB_CMD'";
+    local LATEST_DB=$(echo -e $LATEST_DB_CMD | sh);
+
+    local DB_LOCATION="$HOME/git/cms/db/"
+    echo -e "\nCopying the database to $DB_LOCATION";
+    echo -e "...This may take a few minutes...\n";
+    local DB_SCP_CMD="scp $CMS_DB_SERVER_LOCATION:$LATEST_DB $DB_LOCATION."
+    echo -e $DB_SCP_CMD | sh;
+
+    local FINDDB_CMD="find $DB_LOCATION$(ls -S1 $DB_LOCATION | head -1)";
+    local RAWDB_CMD="$FINDDB_CMD | xargs cat";
+    local UNZIPDB_CMD="gzip -d | psql -U $USER -h 127.0.0.1 -f - cms"
+    local REIMPORT_CMD="$RAWDB_CMD | $UNZIPDB_CMD"
+
+    echo -e "\nRemporting '$CMS_PSQL_DB' database using the following command:";
+    echo -e "$REIMPORT_CMD";
+    echo -e $REIMPORT_CMD | sh;
+
+    echo -e "\nUpdating the CMS repo\n";
+    eval cmsmigrate;
+    echo -e "Updated.";
+
+    echo -e "\nCMS database reimport done.";
+}
+
+alias cms='f(){ unset "$@" && source ~/.bash_aliases && clear && "$@"; unset -f f; }; f'
+alias cmsenv="devenv cms && cmspath"
+alias cmscelery="cmsenv && celery -A celery_init worker --loglevel=debug"
+alias cmspath="cd $HOME/git/cms/src/247 && pyclean"
+alias cmsdbpath="cd $HOME/git/cms/db/."
+alias cmskill="lsof -i:8000 | grep [p]ython | awk '{print \"kill \"\$2}' | sh"
+alias cmsmake="cmsenv && python manage.py makemigrations --noinput"
+alias cmsmigrate="cmsenv && python manage.py migrate --noinput"
+alias cmsserver="cmskill; cmsenv && python manage.py runserver --insecure"
+alias cmsshell="cmsenv && python manage.py shell_plus --quiet"
+alias pyclean='find . -type f -name "*.py[co]" -exec rm -f \{\} \;'

@@ -1,0 +1,26 @@
+# Aptcast
+function aptcastdevupdate(){
+    eval aptcastpath
+    eval aptcastfreshinstall
+}
+
+function aptcastiosbuild(){
+    ionic cordova build ios \
+        --developmentTeam="Apartments24-7.com" \
+        --codeSignIdentity="iPhone Developer" \
+        --profile dev
+}
+function aptcastfixplatforms(){
+    ionic platform rm android
+    ionic platform rm ios
+    ionic plugin rm cordova-plugin-firebase
+    ionic platform add android
+    ionic platform add ios
+    ionic plugin add cordova-plugin-firebase
+}
+alias aptcastpath="cd ~/git/ResidentPlus/"
+alias aptcastfreshinstall="nvm install-latest-npm && npm i -g ionic"
+alias aptcastbuildandroid="ionic cordova build android"
+alias aptcastrebuildandroid="ionic cordova platform remove android && ionic cordova platform add android@latest"
+alias aptcastbuildios="ionic cordova build ios"
+alias aptcastrebuildios="ionic cordova platform remove ios && ionic cordova platform add ios@latest"

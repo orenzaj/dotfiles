@@ -1,0 +1,35 @@
+# Resident Plus
+function RPBrowserBuild(){
+    ionic build
+    ionic serve
+}
+
+function RPAndroidBuild(){
+    ionic repair
+    ionic cap sync
+    npx cap update android
+    npx cap copy android
+    npx cap open android
+}
+
+function RPIosBuild(){
+    ionic build
+    npx cap update ios
+    npx cap copy ios
+    npx cap open ios
+}
+
+function RPSetup(){
+    nvm install-latest-npm
+    npm uninstall -g @ionic/cli
+    npm install -g @ionic/cli
+    npx cap add ios
+    npx cap add android
+}
+
+alias RP-android="RP-refresh RPAndroidBuild"
+alias RP-browser="RP-refresh RPBrowserBuild"
+alias RP-ios="RP-refresh RPIosBuild"
+alias RP-path="cd ~/git/ResidentPlus/"
+alias RP-refresh='f(){ unset "$@" && source ~/.bash_aliases && clear && RP-path && "$@"; unset -f f; }; f'
+alias RP-setup="RP-refresh RPSetup"

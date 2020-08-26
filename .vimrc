@@ -2,15 +2,15 @@
 " Vim Plug auto installer "
 """""""""""""""""""""""""""
 if empty(glob('~/.vim/autoload/plug.vim'))
-    silent curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
-        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-    autocmd VimEnter * PlugInstall
+  silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
 """"""""""""""""""""
 " VimPlug Settings "
 """"""""""""""""""""
-call plug#begin('~/.vim/plugged')
+call plug#begin('~/.config/nvim/plugged')
     Plug 'airblade/vim-rooter'
     Plug 'airblade/vim-gitgutter'
     Plug 'dracula/vim', { 'as': 'dracula' }
@@ -312,7 +312,7 @@ set path+=$HOME/git/cms/src/247/templates_backend
 """""""""""""""""""
 let g:rooter_resolve_links = 1
 let g:rooter_change_directory_for_non_project_files = ''
-let g:rooter_use_lcd = 1
+let g:rooter_cd_cmd = "lcd"
 let g:rooter_manual_only = 1
 let g:rooter_patterns = ['Rakefile', '.git', '.git/']
 map <leader>cr :Rooter <CR>

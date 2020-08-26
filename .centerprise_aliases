@@ -1,0 +1,133 @@
+# Dockers
+alias startcentdocker="docker start dev-centerprise-nginx dev-centerprise-sentry dev-centerprise-cms dev-centerprise-cms-login"
+alias startcmsdocker="docker start dev-cms-mailhog dev-cms-redis-server"
+alias restartdockers="\/etc\/init\.d\/docker restart"
+alias stopdockers="\/etc\/init\.d\/docker stop"
+
+# Centerprise CMS
+alias centpath="cd ~/git/centerprise/src/"
+alias centactivate="pyenv activate cent-env && centpath"
+alias centcmsbuild="devenv cent && ./build.py --clean cms-login"
+alias centcmsrebuild="restartdockers && devenv cent && ./build.py --use-cache cms-login && startcmsdocker"
+alias centcmsstart="centcmsbuild && centcmsattach"
+alias centcmsrestart="restartdockers && devenv cent && startcentdocker && centcmsattach"
+alias centcmsattah="docker attach dev-centerprise-cms"
+
+# Repo updates
+alias leasingportalupdate="backsassupdate && gogogadgetupdate && jsonbornupdate && portalupdate"
+alias portalupdate="portalpath && git pull"
+alias jsonbornupdate="jsonbornpath && git pull"
+alias backsassupdate="backsasspath && git pull"
+alias gogogadgetupdate="gogogadgetpath && git pull"
+
+# Repo paths
+alias portalpath="centpath && cd cms-images/cms-leasing-portal"
+alias jsonbornpath="cd ~/git/centerprise/json-born"
+alias backsasspath="cd ~/git/centerprise/back-sass"
+alias gogogadgetpath="cd ~/git/centerprise/go-go-gadget"
+
+# Database Reimports
+alias portaldbupdate="centpath && dropdb leasingportal && createdb leasingportal && cat cms-images/cms-leasing-portal/sql/createdb.sql | psql -f - leasingportal"
+
+# Start Servers
+alias startserver='f(){ unset "$@" && source ~/.bash_aliases && clear && "$@"; unset -f f; }; f'
+alias startirlurl="startserver irlurlserver"
+alias startportal="startserver portalserver"
+alias startportalapi="startserver apiconvergenceserver"
+alias startnginxwebsiteruntime="startserver nginxwebsiteruntimeserver"
+
+# Build servers
+alias apiconvergencebuild="go build github.com/Apartments24-7/centerprise/cms-images/api-convergence"
+alias irlserverbuild="go build github.com/Apartments24-7/centerprise/local-only-images/irl-urls"
+alias portalbuild="go build github.com/Apartments24-7/centerprise/cms-images/cms-leasing-portal"
+alias nginxwebsiteruntimebuild="go build github.com/Apartments24-7/centerprise/misc-images/nginx-website-runtime"
+
+# Rebuild servers
+alias apiconvergencerebuild="rm api-convergence; go build -a github.com/Apartments24-7/centerprise/cms-images/api-convergence"
+alias irlserverrebuild="rm irl-urls; go build -a github.com/Apartments24-7/centerprise/local-only-images/irl-urls"
+alias portalrebuild="rm cms-leasing-portal; go build -a github.com/Apartments24-7/centerprise/cms-images/cms-leasing-portal"
+alias nginxwebsiteruntimerebuild="rm nginx-website-runtime; go build -a github.com/Apartments24-7/centerprise/misc-images/nginx-website-runtime"
+
+# Run servers
+function irlurlserver() {
+    devenv cent;
+    local IRLURLPORT=3001;
+    local CENTSRC="/home/jorenza/go/src/github.com/Apartments24-7/centerprise";
+    eval killserver $IRLURLPORT;
+    eval irlserverbuild;
+    VERBOSE=1 ./irl-urls \
+        --irl-domain 247.freedomfloorplans.apartments \
+        --git-data-dir "$CENTSRC/test" \
+        --listen-address :$IRLURLPORT \
+        --render base
+        # --irl-domain 247.mediamanager.apartments \
+    }
+
+function portalserver() {
+    devenv cent;
+    local APICONVERGENCEPORT=7000;
+    local CMSPORT=8000;
+    local PORTALPORT=8080;
+    local CENTSRC="/home/jorenza/go/src/github.com/Apartments24-7/centerprise";
+    eval killserver $PORTALPORT;
+    eval portalbuild;
+
+        # --access-log-enabled \
+    VERBOSE=1 ./cms-leasing-portal \
+        -k "dev" \
+        --api-convergence-url "http://127.0.0.1:$APICONVERGENCEPORT/api-convergence/" \
+        --aptexx-v2-api-token 1ISHSZPTB3C9XE7Q \
+        --aptexx-v2-callback-url https://fees1.apts247.us \
+        --aptexx-v2-payment-domain clientsandbox.aptx.cm \
+        --cms-247-host "dev.viaryland.com:$CMSPORT" \
+        --cms-leasing-host "247.apts247.us:$PORTALPORT" \
+        --disable-json-born-cache \
+        --disable-kms \
+        --disable-manager-email \
+        --disable-template-updates \
+        --disable-tls-cms \
+        --disable-tls-leasing-portal \
+        --email-port "1025" \
+        --email-server "172.17.0.1" \
+        --git-data-dir "$CENTSRC/test" \
+        --portal-leasing-host "portal.apts247.us:$PORTALPORT" \
+        --view-leasing-host "dev.viaryland.com"
+    }
+
+function apiconvergenceserver() {
+    devenv cent;
+    local APICONVERGENCEPORT=7000
+    eval killserver $APICONVERGENCEPORT;
+    eval apiconvergencebuild;
+    VERBOSE=1 ./api-convergence \
+        -k dev \
+        --listen-address 127.0.0.1:$APICONVERGENCEPORT
+    }
+
+function nginxwebsiteruntimeserver() {
+    devenv cent;
+    local APICONVERGENCEPORT=7000
+    eval nginxwebsiteruntimebuild;
+    VERBOSE=1  ./nginx-website-runtime \
+        -k dev \
+        --api-convergence-url http://127.0.0.1:$APICONVERGENCEPORT/api-convergence/ \
+        --spider-domains localsite.viaryland.com,
+    }
+
+# Kill servers
+function killserver() {
+    if [[ ! -z "$1" ]]; then
+        local KILLCMD=$(lsof -i :$1 | grep $USER | awk '{ print $2 }')
+        if [[ $KILLCMD ]]; then
+            kill -9 $KILLCMD
+        fi
+    fi
+}
+
+# Test portal
+function testportal() {
+    eval portalpath;
+    local CENTSRC="/home/jorenza/go/src/github.com/Apartments24-7/centerprise";
+    KEY_PATH=$CENTSRC/dev/ GIT_DATA_DIR=$CENTSRC/test/ go test -v -coverprofile cover.out .
+    go tool cover -html=cover.out -o cover.html
+}c

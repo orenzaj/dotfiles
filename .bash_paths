@@ -1,6 +1,8 @@
 # Go
-export GOPATH=$HOME/go
-export GOBIN=$GOPATH/bin
+export GOPATH="$(go env GOPATH)"
+export GOBIN="$(go env GOPATH)/bin"
+export GOROOT="$(go env GOROOT)"
+PATH="$GOBIN:$PATH"
 
 # Rvm
 export RVMPATH=$HOME/.rvm
@@ -20,4 +22,8 @@ export RIPGREP_CONFIG_PATH=$HOME/.ripgreprc
 # Nvm
 export NVM_DIR="$HOME/.nvm"
 
-export PATH=$PATH:$HOME/bin:$HOME/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/usr/local/go/bin:$GOBIN:$HOME/.pyenv/bin:$HOME/.rvm/bin
+# PostgreSQL 9.6
+PATH="/usr/local/opt/postgresql@9.6/bin:$PATH"
+
+# Path
+export PATH=`echo $PATH | tr ':' '\n' | sort | uniq | tr '\n' ':' | sed 's/.$//'`
