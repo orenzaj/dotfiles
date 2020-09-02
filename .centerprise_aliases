@@ -30,23 +30,26 @@ alias gogogadgetpath="cd ~/git/centerprise/go-go-gadget"
 alias portaldbupdate="centpath && dropdb leasingportal && createdb leasingportal && cat cms-images/cms-leasing-portal/sql/createdb.sql | psql -f - leasingportal"
 
 # Start Servers
-alias startserver='f(){ unset "$@" && source ~/.bash_aliases && clear && "$@"; unset -f f; }; f'
+alias startserver='f(){ unset "$@" && source ~/.bash_aliases && centpath && clear && "$@"; unset -f f; }; f'
 alias startirlurl="startserver irlurlserver"
 alias startportal="startserver portalserver"
 alias startportalapi="startserver apiconvergenceserver"
 alias startnginxwebsiteruntime="startserver nginxwebsiteruntimeserver"
+alias startcmslogin="startserver cmsloginserver"
 
 # Build servers
 alias apiconvergencebuild="go build github.com/Apartments24-7/centerprise/cms-images/api-convergence"
 alias irlserverbuild="go build github.com/Apartments24-7/centerprise/local-only-images/irl-urls"
 alias portalbuild="go build github.com/Apartments24-7/centerprise/cms-images/cms-leasing-portal"
 alias nginxwebsiteruntimebuild="go build github.com/Apartments24-7/centerprise/misc-images/nginx-website-runtime"
+alias cmsloginbuild="go build github.com/Apartments24-7/centerprise/cms-images/cms-login"
 
 # Rebuild servers
 alias apiconvergencerebuild="rm api-convergence; go build -a github.com/Apartments24-7/centerprise/cms-images/api-convergence"
 alias irlserverrebuild="rm irl-urls; go build -a github.com/Apartments24-7/centerprise/local-only-images/irl-urls"
 alias portalrebuild="rm cms-leasing-portal; go build -a github.com/Apartments24-7/centerprise/cms-images/cms-leasing-portal"
 alias nginxwebsiteruntimerebuild="rm nginx-website-runtime; go build -a github.com/Apartments24-7/centerprise/misc-images/nginx-website-runtime"
+alias cmsloginrebuild="rm cms-login; go build -a github.com/Apartments24-7/centerprise/cms-images/cms-login"
 
 # Run servers
 function irlurlserver() {
@@ -114,6 +117,13 @@ function nginxwebsiteruntimeserver() {
         --spider-domains localsite.viaryland.com,
     }
 
+function cmsloginserver() {
+    devenv cent;
+    local APICONVERGENCEPORT=8080
+    eval cmsloginbuild;
+    VERBOSE=1  ./cms-login
+    }
+
 # Kill servers
 function killserver() {
     if [[ ! -z "$1" ]]; then
@@ -130,4 +140,4 @@ function testportal() {
     local CENTSRC="/home/jorenza/go/src/github.com/Apartments24-7/centerprise";
     KEY_PATH=$CENTSRC/dev/ GIT_DATA_DIR=$CENTSRC/test/ go test -v -coverprofile cover.out .
     go tool cover -html=cover.out -o cover.html
-}c
+}

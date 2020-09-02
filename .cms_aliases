@@ -23,6 +23,7 @@ function devenv() {
                 fi
             fi
         fi
+        eval $ENVPATH
     fi
 }
 
@@ -62,6 +63,13 @@ function cmsdb() {
     echo -e "Updated.";
 
     echo -e "\nCMS database reimport done.";
+}
+
+function cmsremake() {
+    local LAST_MIGRATE=`cmsmigrate $1 --list | tail -2 | head -1 | cut -d '_' -f1 | cut -d ' ' -f3`
+    eval cmsmigrate $1 $LAST_MIGRATE
+    eval cmsmake $1
+    eval cmsmigrate $1
 }
 
 alias cms='f(){ unset "$@" && source ~/.bash_aliases && clear && "$@"; unset -f f; }; f'

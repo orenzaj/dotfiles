@@ -186,6 +186,7 @@ set relativenumber
 noremap <leader>n :call ToggleNumber()<cr>
 function! ToggleNumber()
 	GitGutterToggle
+	IndentLinesToggle
     set number!
     set relativenumber!
 endfunction

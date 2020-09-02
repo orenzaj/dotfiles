@@ -1,8 +1,9 @@
 # Go
-export GOPATH="$(go env GOPATH)"
-export GOBIN="$(go env GOPATH)/bin"
-export GOROOT="$(go env GOROOT)"
-PATH="$GOBIN:$PATH"
+# export GOPATH="$(go env GOPATH)"
+# export GOBIN="$(go env GOPATH)/bin"
+# export GOROOT="$(go env GOROOT)"
+# PATH="$GOBIN:$PATH"
+PATH="/usr/local/opt/go@1.14/bin:$PATH"
 
 # Rvm
 export RVMPATH=$HOME/.rvm

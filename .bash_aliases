@@ -30,3 +30,4 @@ if [ -f ~/.cms_aliases ]; then . ~/.cms_aliases ; fi
 if [ -f ~/.rp_aliases ]; then . ~/.rp_aliases ; fi
 if [ -f ~/.aptcast_aliases ]; then . ~/.aptcast_aliases ; fi
 if [ -f ~/.centerprise_aliases ]; then . ~/.centerprise_aliases ; fi
+if [ -f ~/.arapi_aliases ]; then . ~/.arapi_aliases ; fi

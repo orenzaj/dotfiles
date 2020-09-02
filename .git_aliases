@@ -42,6 +42,8 @@ alias gpu="git push -u origin HEAD"
 alias gpb='f(){ gcb && gitam && git commit {"$@"} && gpu; unset -f f; }; f'
 
 # Stash
+alias gsv="git stash show -v"
+alias gsp="git stash pop"
 alias gsl="git stash list"
 alias gss="git stash save"
 alias gsa='f(){ git stash apply stash@{"$@"};  unset -f f; }; f'

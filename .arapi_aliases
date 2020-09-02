@@ -1,0 +1,7 @@
+# Start Servers
+alias startserver='f(){ unset "$@" && source ~/.bash_aliases && arapipath && clear && "$@"; unset -f f; }; f'
+
+alias arapipath="cd ~/git/reservation-api/src"
+
+# Database Reimports
+alias arapidbupdate="arapipath && dropdb arapi && createdb arapi && cat schema/0000_start.sql | psql -f - arapi"
