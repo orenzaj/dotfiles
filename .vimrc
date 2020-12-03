@@ -137,6 +137,10 @@ autocmd BufWritePre * :%s/\s\+$//e
 " xmllint "
 """""""""""
 nmap <leader>x :%!xmllint --format % <CR>
+""""""""""""""
+" Source vim "
+""""""""""""""
+nmap <leader>5 :so $MYVIMRC <bar> e % <CR>
 
 """""""""""""""""""
 " CtrlSF settings "
@@ -299,7 +303,7 @@ catch /.*/
 		endtry
 	endtry
 endtry
-"echo g:BrianOpenFileName
+echo g:BrianOpenFileName
 endfunction
 
 """""""""""""""""
@@ -307,9 +311,11 @@ endfunction
 """""""""""""""""
 set path+=$HOME/git/cms/src/247/apps247
 set path+=$HOME/git/cms/src/247/templates_backend
+set path+=$HOME/git/cms/src/247/staticfiles
 
 """""""""""""""""""
 " Rooter settings "
+
 """""""""""""""""""
 let g:rooter_resolve_links = 1
 let g:rooter_change_directory_for_non_project_files = ''
@@ -322,10 +328,10 @@ map <leader>cr :Rooter <CR>
 " Vim Vinegar settings "
 """"""""""""""""""""""""
 " Hide hidden files ('gh' to toggle)
-" let g:netrw_list_hide = '\(^\|\s\s\)\zs\.\S\+\'
 
 " Hide .pyc files
 let g:netrw_list_hide='.*\.pyc$'
+let g:netrw_hide=1
 
 " Fix duplicates showing
 let g:netrw_fastbrowse=2
@@ -356,14 +362,16 @@ let g:ale_lint_on_save = 1
 let g:ale_lint_on_text_changed = 'never'
 
 " Fixers
-let g:ale_fix_on_save = 1
+let g:ale_fix_on_save = 0
 let g:ale_fixers = {
             \ 'python': ['autopep8'],
             \ 'javascript': ['prettier', 'eslint'],
             \ '*': ['remove_trailing_lines', 'trim_whitespace']
             \}
-let b:ale_python_flake8_options = '--max-line-length=100 --ignore=E722,E226,W503,E702'
-let b:ale_python_autopep8_options = '--max-line-length=100 --ignore=E722,E226,W503,E702'
+let b:ale_python_flake8_options = '--max-line-length=100 --ignore=E226,W503,E702,W504'
+let b:ale_python_autopep8_options = '--max-line-length=100 --ignore=E226,W503,E702,W504'
+" let b:ale_python_flake8_options += '405,403'
+" let b:ale_python_autopep8_options += '405,403'
 
 """""""""""""
 " css_color "
@@ -375,3 +383,11 @@ let g:cssColorVimDoNotMessMyUpdatetime = 1
 """"""""""""""""""""""""""
 let python_highlight_all = 1
 au FileType python syn keyword pythonDecorator True None False self
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Django Testing
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+
+nnoremap <silent> <leader>t :exe "!tmux send -t 1 'execfile(\"test/%\")' Enter"<CR><C-L>
+nnoremap <silent> <leader>T :exe "!tmux send -t 1 'execfile(\"test/utils.py\")' Enter"<CR><C-L>

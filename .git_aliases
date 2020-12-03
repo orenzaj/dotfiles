@@ -33,7 +33,7 @@ alias gitds="git diff --staged"
 alias gitmig="gs | grep 'migrations' | awk '{print \$2}'"
 
 # Branches
-alias gb="git for-each-ref --sort=committerdate refs/heads/ --format='%(committerdate:short) %(refname:short)'"
+alias gb="git for-each-ref --sort=committerdate refs/heads/ --format='%(committerdate:short) %(refname:short)' | sort -r | head -10"
 alias gcm="git checkout master"
 alias gcb="git checkout -b"
 
@@ -44,6 +44,7 @@ alias gpb='f(){ gcb && gitam && git commit {"$@"} && gpu; unset -f f; }; f'
 # Stash
 alias gsv="git stash show -v"
 alias gsp="git stash pop"
-alias gsl="git stash list"
+alias gsl="git stash list | head -10"
 alias gss="git stash save"
 alias gsa='f(){ git stash apply stash@{"$@"};  unset -f f; }; f'
+alias gap='f(){ git stash show -p stash@{"$@"} | git apply --reverse;  unset -f f; }; f'

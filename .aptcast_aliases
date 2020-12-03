@@ -10,6 +10,7 @@ function aptcastiosbuild(){
         --codeSignIdentity="iPhone Developer" \
         --profile dev
 }
+
 function aptcastfixplatforms(){
     ionic platform rm android
     ionic platform rm ios
@@ -18,9 +19,13 @@ function aptcastfixplatforms(){
     ionic platform add ios
     ionic plugin add cordova-plugin-firebase
 }
-alias aptcastpath="cd ~/git/ResidentPlus/"
-alias aptcastfreshinstall="nvm install-latest-npm && npm i -g ionic"
-alias aptcastbuildandroid="ionic cordova build android"
-alias aptcastrebuildandroid="ionic cordova platform remove android && ionic cordova platform add android@latest"
-alias aptcastbuildios="ionic cordova build ios"
-alias aptcastrebuildios="ionic cordova platform remove ios && ionic cordova platform add ios@latest"
+
+alias ac-path="cd ~/git/Aptcast/"
+alias ac-env="devenv aptcast && ac-path"
+
+# Lambda Funcs
+alias ac-lambda='ac-env && cd lambda-funcs && export PYTHONPATH="$PWD/shared"'
+alias ac-lambda-test="ac-lambda && python handlers/combined/master/tests.py"
+
+# SSH
+alias sshgom="ssh -i ~/Downloads/'Go-Migrations.pem' ubuntu@ec2-54-218-110-38.us-west-2.compute.amazonaws.com"

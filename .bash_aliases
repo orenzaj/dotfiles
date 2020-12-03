@@ -9,6 +9,7 @@ if [ -x "$(which nvim)"  ]; then
 fi
 
 # Misc
+alias ntmux="TMUX=; tmux a -t cms"
 alias pyclean='find . -type f -name "*.py[co]" -exec rm -f \{\} \;'
 alias speedtest="curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python -"
 alias whatsmyextip="dig +short myip.opendns.com @resolver1.opendns.com | awk '{print \"external: \"\$1}'"
@@ -17,6 +18,7 @@ alias whatsmyip="whatsmylocalip && whatsmyextip"
 alias whatsmyip4="dig @resolver1.opendns.com A myip.opendns.com +short -4"
 alias whatsmyip6="dig @resolver1.opendns.com A myip.opendns.com +short -6"
 alias xclip-grab="xclip -i -selection clipboard"
+alias minjs='f(){ terser --compress --mangle -- "$1";  unset -f f; }; f'
 
 # Trello
 alias trellopath="cd ~/git/trello/src/"
@@ -31,3 +33,16 @@ if [ -f ~/.rp_aliases ]; then . ~/.rp_aliases ; fi
 if [ -f ~/.aptcast_aliases ]; then . ~/.aptcast_aliases ; fi
 if [ -f ~/.centerprise_aliases ]; then . ~/.centerprise_aliases ; fi
 if [ -f ~/.arapi_aliases ]; then . ~/.arapi_aliases ; fi
+
+
+sasswatch() {
+    ls -1 *ss | grep -v min. | awk '{print "sass --style=compressed --watch "$1" "$1}'
+}
+
+minifyjs() {
+    ls -1 | grep -v min. | awk '{print "terser --compress --mangle -- "$1" > "$1}' | sed 's/\./.min./2' | sh
+}
+
+minifycss() {
+    ls -1 | grep -v min. | awk '{print "yuicompressor "$1" -o "$1}' | sed 's/\./.min./2' | sh
+}

@@ -33,30 +33,11 @@ function cmsdb() {
     echo -e "Killed.";
 
     echo -e "\nReinitializing database 'cms'\n...";
-    dropdb cms;
-    createdb cms;
+    dbremake cms
     echo -e "Reinitialized.";
 
-    echo -e "\nFinding latest database dump in 'tomservo'";
-    echo -e "...\n";
-    local FINDDB_CMD="find /data/db -name \x24(ls -1St /data/db | head -1)";
-    local LATEST_DB_CMD="ssh tomservo '$FINDDB_CMD'";
-    local LATEST_DB=$(echo -e $LATEST_DB_CMD | sh);
-
-    local DB_LOCATION="$HOME/git/cms/db/"
-    echo -e "\nCopying the database to $DB_LOCATION";
-    echo -e "...This may take a few minutes...\n";
-    local DB_SCP_CMD="scp $CMS_DB_SERVER_LOCATION:$LATEST_DB $DB_LOCATION."
-    echo -e $DB_SCP_CMD | sh;
-
-    local FINDDB_CMD="find $DB_LOCATION$(ls -S1 $DB_LOCATION | head -1)";
-    local RAWDB_CMD="$FINDDB_CMD | xargs cat";
-    local UNZIPDB_CMD="gzip -d | psql -U $USER -h 127.0.0.1 -f - cms"
-    local REIMPORT_CMD="$RAWDB_CMD | $UNZIPDB_CMD"
-
-    echo -e "\nRemporting '$CMS_PSQL_DB' database using the following command:";
-    echo -e "$REIMPORT_CMD";
-    echo -e $REIMPORT_CMD | sh;
+    eval cmspulldb
+    eval cmsreimportdb
 
     echo -e "\nUpdating the CMS repo\n";
     eval cmsmigrate;
@@ -65,21 +46,72 @@ function cmsdb() {
     echo -e "\nCMS database reimport done.";
 }
 
-function cmsremake() {
-    local LAST_MIGRATE=`cmsmigrate $1 --list | tail -2 | head -1 | cut -d '_' -f1 | cut -d ' ' -f3`
-    eval cmsmigrate $1 $LAST_MIGRATE
-    eval cmsmake $1
-    eval cmsmigrate $1
+function cmspulldb() {
+    if [ -f "$HOME/.ssh/config" ]; then
+        local SERVERIDX;
+        echo -e "\nChoosing the server to pull the database...";
+        sed -n "s/Host//p" ~/.ssh/config | grep -iv name | awk '{print "    ["NR"]", $1}'
+        read -p "Please enter the corresponding number: " SERVERIDX;
+
+        local SERVERCOUNT=$(sed -n "s/Host//p" ~/.ssh/config | grep -iv name | awk '{print "    ["NR"]", $1}' | wc -l);
+        if [ $SERVERIDX -gt 0 ] && [ $SERVERIDX -le $SERVERCOUNT ]; then
+            local CHOSENSERVER=$(sed -n "s/Host//p" ~/.ssh/config | grep -iv name | awk '{print "    ["NR"]", $1}' | grep $SERVERIDX | awk '{print $2}');
+        else
+            echo "Invalid input.";
+        return;
+        fi
+    else
+        local $SERVERIP;
+        local $SERVERUSER;
+        local $SERVERPORT;
+        read -p "Please enter the IP address of the server: " $SERVERIP;
+        read -p "Please enter your username for the server: " $SERVERUSER;
+        read -p "Please enter the port of the server: " $SERVERPORT;
+        local CHOSENSERVER="$SERVERUSER@$SERVERIP:$SERVERPORT";
+    fi
+    CMS_DB_SERVER_LOCATION=$CHOSENSERVER;
+
+    echo -e "\nFinding latest database dump in '$CMS_DB_SERVER_LOCATION'";
+    echo -e "...";
+    local FINDDB_CMD='find /data/db -name "`ls -1St /data/db | head -1`"';
+    local LATEST_DB_CMD="ssh $CMS_DB_SERVER_LOCATION '$FINDDB_CMD'";
+    local LATEST_DB=`echo -e $LATEST_DB_CMD | sh`;
+    echo -e "Found: $LATEST_DB"
+
+    local DB_LOCATION="$HOME/git/cms/db/"
+    echo -e "\nCopying the database to $DB_LOCATION";
+    echo -e "...This may take a few minutes...\n";
+    local DB_SCP_CMD="scp $CMS_DB_SERVER_LOCATION:$LATEST_DB $DB_LOCATION."
+    echo -e $DB_SCP_CMD | sh;
 }
 
+function cmsreimportdb() {
+    local DB_LOCATION="$HOME/git/cms/db/"
+    local FINDDB_CMD="find $DB_LOCATION$(ls -S1 $DB_LOCATION | head -1)";
+    local RAWDB_CMD="$FINDDB_CMD | xargs cat";
+    local UNZIPDB_CMD="gzip -d | psql -U $USER -h 127.0.0.1 -f - cms"
+    local REIMPORT_CMD="$RAWDB_CMD | $UNZIPDB_CMD"
+
+    echo -e "\nRemporting 'cms' database using the following command:";
+    echo -e "$REIMPORT_CMD";
+    echo -e $REIMPORT_CMD | sh;
+}
+
+alias dbremake='f() { [[ -n $1 ]] && [[ ! -z `psql -l | grep $1` ]] && dropdb $1; createdb $1; unset -f f; }; f'
 alias cms='f(){ unset "$@" && source ~/.bash_aliases && clear && "$@"; unset -f f; }; f'
 alias cmsenv="devenv cms && cmspath"
-alias cmscelery="cmsenv && celery -A celery_init worker --loglevel=debug"
+alias cmscelery="cmsenv && celery -A celery_init worker --loglevel=debug --purge"
 alias cmspath="cd $HOME/git/cms/src/247 && pyclean"
-alias cmsdbpath="cd $HOME/git/cms/db/."
+alias cmsapps="cmspath && cd apps247/"
+alias cmstb="cmspath && cd templates_backend/"
+alias cmstf="cmspath && cd templates_frontend/"
+alias cmsstatic="cmspath && cd staticfiles/"
+alias cmsdbpath="cd $HOME/git/cms/db"
 alias cmskill="lsof -i:8000 | grep [p]ython | awk '{print \"kill \"\$2}' | sh"
 alias cmsmake="cmsenv && python manage.py makemigrations --noinput"
 alias cmsmigrate="cmsenv && python manage.py migrate --noinput"
 alias cmsserver="cmskill; cmsenv && python manage.py runserver --insecure"
 alias cmsshell="cmsenv && python manage.py shell_plus --quiet"
+alias cmstest="cmsenv && python manage.py"
+alias cmsmongo="sudo mongod --dbpath $HOME/git/cms/db/mongo"
 alias pyclean='find . -type f -name "*.py[co]" -exec rm -f \{\} \;'

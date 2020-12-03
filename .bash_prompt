@@ -18,7 +18,7 @@ INDIGO="\[$(tput setaf 69)\]"
 ################
 ct(){
     CTIME="\@"
-    echo -e "${WHITE}[${PINK}${CTIME}${WHITE}] "
+    echo "${WHITE}[${PINK}${CTIME}${WHITE}] "
 }
 
 ################
@@ -26,7 +26,7 @@ ct(){
 ################
 cu() {
     CUSER="\u"
-    echo -e "${RED}${CUSER}${WHITE} "
+    echo "${RED}${CUSER}${WHITE} "
 }
 
 ################
@@ -34,7 +34,7 @@ cu() {
 ################
 ch() {
     CHOST="\h"
-    echo -e "at ${BLUE}${CHOST}${WHITE} "
+    echo "at ${BLUE}${CHOST}${WHITE} "
 }
 
 #####################
@@ -42,7 +42,7 @@ ch() {
 #####################
 wd() {
     CDIR="\w"
-    echo -e "in ${YELLOW}${CDIR}${WHITE} "
+    echo "in ${YELLOW}${CDIR}${WHITE} "
 }
 
 ###############
@@ -50,7 +50,7 @@ wd() {
 ###############
 ve() {
     if [ ${VIRTUAL_ENV} ]; then
-        echo -e "(${GREEN}$(basename $VIRTUAL_ENV)${WHITE}) "
+        echo "(${GREEN}$(basename $VIRTUAL_ENV)${WHITE}) "
     fi
 }
 
@@ -59,7 +59,7 @@ ve() {
 ##############
 gp(){
 	if [ -d .git ] || git rev-parse --git-dir > /dev/null 2>&1 ; then
-        echo -e "on ${PURPLE}$(__git_ps1 %s)${WHITE} "
+        echo "on ${PURPLE}$(__git_ps1 %s)${WHITE} "
 	fi
 }
 
@@ -68,7 +68,7 @@ gp(){
 ###############
 sl(){
     SYMBOL="➜"
-    echo -e "\r\n${INDIGO}${SYMBOL} ${WHITE} "
+    echo "\r\n${INDIGO}${SYMBOL} ${WHITE} "
 }
 
 set_prompt() {
